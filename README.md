@@ -1,7 +1,5 @@
 Tareas a realizar:
 
-    - Desarrollar el código (claves.c) que gestiona el almacenamiento y procesamiento de las tuplas.
-
     - Desarrollar el código del servidor (servidor-mq.c) encargado de las comunicaciones con la parte cliente. Este servidor debe ser concurrente, recibirá las peticiones del lado cliente e invocará a las funciones implementadas en claves.c.
 
     - Desarrollar el código que implementa el código (proxy-mq.c) de las llamadas anteriores (destroy, set_value, get_value, delete_key, modify_value y exist) en el lado del cliente. Este código suplanta a las funciones de la API y se encarga de realizar las peticiones al servidor. Es decir, este es el código que ofrece la interfaz a los clientes y se encarga de implementar los servicios anteriores (del lado del cliente) contactando con el servidor anterior.

@@ -1,11 +1,6 @@
+#include "claves.h"
 #ifndef estructuras_h
 #define estructuras_h
-
-// Estructuras a usar
-struct Coord {
-    int x ;
-    int y ;
- } ;
 
 typedef struct Nodo{
     int index;
