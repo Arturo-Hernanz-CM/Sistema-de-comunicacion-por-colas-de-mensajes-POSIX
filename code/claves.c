@@ -4,12 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-Lista *lista = NULL;
+// Variable global auxiliar
+extern Lista *base_datos;
 
 int destroy(void){
-    if(lista != NULL){
-        free(lista); 
-        lista = NULL;
+    if(base_datos != NULL){
+        free(base_datos); 
+        base_datos = NULL;
     }
     else{
         Lista *lista = NULL;
@@ -36,20 +37,26 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
     nodo->value2 = V_value2;
     nodo->value3 = value3;
 
-    if (lista == NULL){ // lista vacia
+    if (base_datos == NULL){ // lista vacia
         nodo->siguiente = NULL;
         nodo->index = 0;
-        lista->inicio = nodo;
-        lista->final = nodo;
-        lista->size = 1;
+
+        base_datos = (Lista *) malloc(sizeof(Lista));
+        if (base_datos == NULL) {
+            return -1;
+        }
+
+        base_datos->inicio = nodo;
+        base_datos->final = nodo;
+        base_datos->size = 1;
         return 0;
     }
     else{
         nodo->siguiente = NULL;
-        nodo->index = lista->size;
-        lista->final->siguiente = nodo;
-        lista->final = nodo;
-        lista->size = lista->size++;
+        nodo->index = base_datos->size;
+        base_datos->final->siguiente = nodo;
+        base_datos->final = nodo;
+        base_datos->size++;
         return 0;
     }
 }
@@ -59,8 +66,8 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
         return -1;
     }
     else{
-        Nodo *nodo_actual = lista->inicio;
-        for(int indice = 0; indice < lista->size; indice++){
+        Nodo *nodo_actual = base_datos->inicio;
+        for(int indice = 0; indice < base_datos->size; indice++){
             if(nodo_actual->key == key){
                 strcpy(value1, nodo_actual->value1);
                 *N_value2 = nodo_actual->N_value2;
@@ -80,10 +87,16 @@ int modify_value(int key, char *value1, int N_value2, double *V_value2, struct C
         return -1;
     }
     else{
-        Nodo *nodo_actual = lista->inicio;
-        for(int indice = 0; indice < lista->size; indice++){
+        Nodo *nodo_actual = base_datos->inicio;
+        for(int indice = 0; indice < base_datos->size; indice++){
             if(nodo_actual->key == key){
-                nodo_actual->value1 = value1; // no uso strcpy porque directamente cambio el puntero
+                nodo_actual = (char*)malloc(strlen(value1)+1);
+                if (nodo_actual == NULL) {
+                    return -1;
+                }
+                else{
+                    strcpy(nodo_actual->value1, value1);
+                }
                 nodo_actual->N_value2 = N_value2;
                 nodo_actual->value2 = V_value2;
                 nodo_actual->value3 = value3;
@@ -103,23 +116,27 @@ int delete_key(int key){
         return -1;
     }
     else{
-        if(lista->size == 1){
-            free(lista->inicio);
-            lista->inicio = NULL;
-            lista->final = NULL;
-            lista->size = 0;
+        if(base_datos->size == 1){
+            free(base_datos->inicio);
+            base_datos->inicio = NULL;
+            base_datos->final = NULL;
+            base_datos->size = 0;
             return 0;
         }
-        Nodo *nodo_actual = lista->inicio;
+        Nodo *nodo_actual = base_datos->inicio;
         Nodo *nodo_anterior = NULL;
-        for(int indice = 0; indice < lista->size; indice++){
+        for(int indice = 0; indice < base_datos->size; indice++){
             if(nodo_actual->key == key){
                 if(nodo_anterior == NULL){
-                    lista->inicio = nodo_actual->siguiente;
+                    base_datos->inicio = nodo_actual->siguiente;
+                }
+                else if(nodo_actual == base_datos->final){
+                    base_datos->final = nodo_anterior;
                 }
                 else{
                     nodo_anterior->siguiente = nodo_actual->siguiente;
                 }
+                base_datos->size--;
                 free(nodo_actual);
                 return 0;
             }
@@ -133,12 +150,12 @@ int delete_key(int key){
 }
 
 int exist(int key){
-    if (lista == NULL){
+    if (base_datos == NULL){
         return -1;
     }
     else{
-        Nodo *nodo_actual = lista->inicio;
-        for(int indice = 0; indice < lista->size; indice++){
+        Nodo *nodo_actual = base_datos->inicio;
+        for(int indice = 0; indice < base_datos->size; indice++){
             if(nodo_actual->key == key){
                 return 0;
             }

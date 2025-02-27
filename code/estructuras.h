@@ -20,4 +20,14 @@ typedef struct{
     int size;
 }Lista;
 
+typedef struct{
+    int key;
+    char *value1;  
+    int N_value2;
+    double *value2;
+    struct Coord value3;
+
+    char cola_cliente[256];
+}Peticion;
+
 #endif
