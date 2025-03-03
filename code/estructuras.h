@@ -26,6 +26,15 @@ typedef struct{
     int N_value2;
     double *value2;
     struct Coord value3;
+    int peticion;
+    /*
+        0 -> destroy
+        1 -> set_value
+        2 -> get_value
+        3 -> modify_value
+        4 -> delete_key
+        5 -> exist
+    */
 
     char cola_cliente[256];
 }Peticion;
