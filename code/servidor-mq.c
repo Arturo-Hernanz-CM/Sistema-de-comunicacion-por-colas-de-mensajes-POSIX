@@ -3,6 +3,7 @@
 #include <stdio.h> 
 #include <mqueue.h>
 #include <pthread.h>
+#include <stdlib.h>
 
 // Variables globales
 Lista * base_datos = NULL;
@@ -12,34 +13,34 @@ pthread_cond_t condicion_mensaje;
 int mensaje_copiado = 0;
 
 
-void *leer_cola(void *Peticion) {
+void *leer_cola(Peticion * peticion) {
     mqd_t cola_cliente;
-    struct Peticion peticion_local;
+    Peticion peticion_local;
     int respuesta;
 
     // Copiar la petición a local
-    pthread_mutex_lock(&mutex_mensaje);
-    peticion_local = *((struct Peticion *) Peticion);
+    pthread_mutex_lock(&mutex_mensaje); 
+    peticion_local = *peticion;
     mensaje_copiado = 1;
     pthread_mutex_unlock(&mutex_mensaje);
 
     // Ejecutar la petición
-    if (peticion_local.opcion == 0) {
+    if (peticion_local.operacion == 0) {
         respuesta = destroy();
     }
-    else if (peticion_local.opcion == 1) {
-        respuesta = insertar(peticion_local.key, peticion_local.value1, peticion_local.N_value2, peticion_local.value2, peticion_local.value3);
+    else if (peticion_local.operacion == 1) {
+        respuesta = set_value(peticion_local.key, peticion_local.value1, peticion_local.N_value2, peticion_local.value2, peticion_local.value3);
     }
-    else if (peticion_local.opcion == 2) {
+    else if (peticion_local.operacion == 2) {
         respuesta = modify_value(peticion_local.key, peticion_local.value1, peticion_local.N_value2, peticion_local.value2, peticion_local.value3);
     }
-    else if (peticion_local.opcion == 3) {
+    else if (peticion_local.operacion == 3) {
         respuesta = delete_key(peticion_local.key);
     }
-    else if (peticion_local.opcion == 4) {
+    else if (peticion_local.operacion == 4) {
         respuesta = exist(peticion_local.key);
     }
-    else if (peticion_local.opcion == 5) {
+    else if (peticion_local.operacion == 5) {
         respuesta = get_value(peticion_local.key, peticion_local.value1, &peticion_local.N_value2, peticion_local.value2, &peticion_local.value3);
     }
     else {
@@ -47,16 +48,16 @@ void *leer_cola(void *Peticion) {
     }
 
     // Enviar la respuesta
-    cola_cliente = mq_open(peticion_local.cliente, O_WRONLY);
+    cola_cliente = mq_open(peticion_local.cola_cliente, O_WRONLY);
     if (cola_cliente == -1) {
         perror("No se puede abrir la cola del cliente");
-		mq_close(q_servidor);
+		mq_close(cola_servidor);
 		mq_unlink("/Servidor");
     }
     else {
-        if (mq_send(cola_cliente, &respuesta, sizeof(respuesta), 0) == -1) {
+        if (mq_send(cola_cliente, (char *)&respuesta, sizeof(respuesta), 0) == -1) {
             perror("No se puede enviar la respuesta");
-            mq_close(q_servidor);
+            mq_close(cola_servidor);
             mq_unlink("/Servidor");
         }
     }
@@ -73,7 +74,7 @@ int main(void) {
     base_datos->size = 0;
 
     // Inicializar estructuras
-    struct Peticion peticion;
+    Peticion peticion;
     struct mq_attr atributos_cola_s;
 
     // Inicializar hilos
@@ -87,7 +88,7 @@ int main(void) {
 
     // Inicializar la cola del serviddor. 
     //El servidor solo lee peticiones aquí, las respuestas en cada cola de cada cliente.
-    atributos_cola_s.mq_msgsize = sizeof((Peticion));
+    atributos_cola_s.mq_msgsize = sizeof(Peticion);
     if (mq_open("/Servidor", O_CREAT | O_RDONLY, 0777, &atributos_cola_s) == -1) {
         return -1;
     }
@@ -96,7 +97,7 @@ int main(void) {
 
 	pthread_attr_setdetachstate(&thread_att, PTHREAD_CREATE_DETACHED);      // threads independientes
     while(1) {
-        if (mq_receive(q_servidor, (char *) &peticion, sizeof(peticion), 0) < 0 ){
+        if (mq_receive(cola_servidor, (char *) &peticion, sizeof(peticion), 0) < 0 ){
 			perror("mq_recev");
 			return -1;
 		}

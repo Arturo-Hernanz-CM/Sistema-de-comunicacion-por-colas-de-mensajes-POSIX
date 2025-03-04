@@ -79,6 +79,7 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
                 nodo_actual = nodo_actual->siguiente;
             }
         }
+        return -1;
     }
 }
 
@@ -90,7 +91,7 @@ int modify_value(int key, char *value1, int N_value2, double *V_value2, struct C
         Nodo *nodo_actual = base_datos->inicio;
         for(int indice = 0; indice < base_datos->size; indice++){
             if(nodo_actual->key == key){
-                nodo_actual = (char*)malloc(strlen(value1)+1);
+                nodo_actual = (Nodo*)malloc(strlen(value1)+1);
                 if (nodo_actual == NULL) {
                     return -1;
                 }

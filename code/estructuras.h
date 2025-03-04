@@ -26,7 +26,7 @@ typedef struct{
     int N_value2;
     double *value2;
     struct Coord value3;
-    int peticion;
+    int operacion;
     /*
         0 -> destroy
         1 -> set_value
