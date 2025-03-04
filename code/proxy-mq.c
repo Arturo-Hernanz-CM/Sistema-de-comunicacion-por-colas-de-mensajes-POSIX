@@ -1,7 +1,9 @@
-#include "claves.h"
 #include "estructuras.h"
 #include <stdio.h> 
 #include <mqueue.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 
 int main(void){
     // Variables
@@ -15,17 +17,17 @@ int main(void){
     struct mq_attr atributos_cola_c;
     
     // Cola del cliente
-    atributos_cola_c.mq_msgsize = sizeof((Peticion));
+    atributos_cola_c.mq_msgsize = sizeof(Peticion);
     sprintf(nombre_cola,  "/Cliente-%d", getpid());
-    cola_cliente = mq_open(nombre_cola, O_CREAT | O_RDONLY, 0777, &atributos_cola_c
+    cola_cliente = mq_open(nombre_cola, O_CREAT | O_RDONLY, 0777, &atributos_cola_c);
     if (cola_cliente == -1) {
         perror("Error al abrir la cola del cliente\n");
         return -1;
     }
 
     // Cola del servidor
-    atributos_cola_c.mq_msgsize = sizeof((Peticion));
-    cola_servidor = mq_open("/Servidor", O_WRONLY)
+    atributos_cola_c.mq_msgsize = sizeof(Peticion);
+    cola_servidor = mq_open("/Servidor", O_WRONLY);
     if (cola_servidor == -1) {
         perror("Error al abrir la cola del servidor\n");
         return -1;
@@ -45,7 +47,7 @@ int main(void){
     strcpy(peticion.cola_cliente, nombre_cola);
     peticion.key = key;
     strcpy(peticion.value1, value1);
-    strcpy(peticion.value2, value2);
+    peticion.value2 = value2;
     peticion.N_value2 = N_value2;
     peticion.value3 = value3;
     peticion.operacion = operacion;
@@ -57,16 +59,16 @@ int main(void){
     }
 
     // Recibir respuesta en la cola del cliente
-    if(mq_recv(cola_cliente, (char *)&respuesta, sizeof(peticion), 0) == -1) {
+    if(mq_receive(cola_cliente, (char *)&respuesta, sizeof(peticion), 0) == -1) {
         perror("No se puede recibir la respuesta");
         mq_close(cola_cliente);
         mq_unlink(nombre_cola);
     }
 
-    printf("Resultado = %d\n", res);
+    printf("Resultado = %d\n", respuesta);
 
-	mq_close(q_servidor);
-	mq_close(q_cliente);
-    mq_unlink(nombre_cola)
+	mq_close(cola_servidor);
+	mq_close(cola_cliente);
+    mq_unlink(nombre_cola);
     return 0;
 }

@@ -88,8 +88,8 @@ int main(void) {
 
     // Inicializar la cola del serviddor. 
     //El servidor solo lee peticiones aquí, las respuestas en cada cola de cada cliente.
-    atributos_cola_s.mq_msgsize = sizeof((Peticion));
-    cola_servidor = mq_open("/Servidor", O_CREAT | O_RDONLY, 0777, &atributos_cola_s)
+    atributos_cola_s.mq_msgsize = sizeof(Peticion);
+    cola_servidor = mq_open("/Servidor", O_CREAT | O_RDONLY, 0777, &atributos_cola_s);
     if (cola_servidor == -1) {
         perror("Error al abrir la cola del servidor\n");
         return -1;
