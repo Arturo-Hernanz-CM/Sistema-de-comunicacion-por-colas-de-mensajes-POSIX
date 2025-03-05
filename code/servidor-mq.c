@@ -22,6 +22,7 @@ void *leer_cola(Peticion * peticion) {
     pthread_mutex_lock(&mutex_mensaje); 
     peticion_local = *peticion;
     mensaje_copiado = 1;
+    pthread_cond_signal(&condicion_mensaje);
     pthread_mutex_unlock(&mutex_mensaje);
 
     // Ejecutar la petición
@@ -50,13 +51,13 @@ void *leer_cola(Peticion * peticion) {
     // Enviar la respuesta
     cola_cliente = mq_open(peticion_local.cola_cliente, O_WRONLY);
     if (cola_cliente == -1) {
-        perror("No se puede abrir la cola del cliente");
-		mq_close(cola_servidor);
-		mq_unlink("/Servidor");
+        perror("No se puede abrir la cola del cliente\n");
+		mq_close(cola_cliente);
+		mq_unlink(peticion_local.cola_cliente);
     }
     else {
         if (mq_send(cola_cliente, (char *)&respuesta, sizeof(respuesta), 0) == -1) {
-            perror("No se puede enviar la respuesta");
+            perror("No se puede enviar la respuesta\n");
             mq_close(cola_servidor);
             mq_unlink("/Servidor");
         }
@@ -67,6 +68,7 @@ int main(void) {
     // Inicializar la lista de claves
     base_datos = (Lista *) malloc(sizeof(Lista));
     if (base_datos == NULL) {
+        perror("Error al reservar memoria para la lista de claves\n");
         return -1;
     }
     base_datos->inicio = NULL;
@@ -82,12 +84,15 @@ int main(void) {
     pthread_attr_t thread_att;
     pthread_attr_init(&thread_att);
 
+
     // Inicializar mutex
     pthread_mutex_init(&mutex_mensaje, NULL);
     pthread_cond_init(&condicion_mensaje, NULL);
 
     // Inicializar la cola del serviddor. 
     //El servidor solo lee peticiones aquí, las respuestas en cada cola de cada cliente.
+    atributos_cola_s.mq_flags = 0;         
+    atributos_cola_s.mq_maxmsg = 10;
     atributos_cola_s.mq_msgsize = sizeof(Peticion);
     cola_servidor = mq_open("/Servidor", O_CREAT | O_RDONLY, 0777, &atributos_cola_s);
     if (cola_servidor == -1) {
@@ -100,7 +105,7 @@ int main(void) {
 	pthread_attr_setdetachstate(&thread_att, PTHREAD_CREATE_DETACHED);      // threads independientes
     while(1) {
         if (mq_receive(cola_servidor, (char *) &peticion, sizeof(peticion), 0) < 0 ){
-			perror("mq_recev");
+			perror("Error al recibir la peticion\n");
 			return -1;
 		}
 

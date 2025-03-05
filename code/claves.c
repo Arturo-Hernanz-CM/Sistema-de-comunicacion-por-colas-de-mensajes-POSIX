@@ -24,13 +24,16 @@ int destroy(void){
 
 int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
     if(N_value2 < 1 || N_value2 > 32){
+        perror("El valor N_value2 debe estar entre 1 y 32\n");
         return -1;
     }
 
     Nodo *nodo = (Nodo *) malloc(sizeof(Nodo));
     if (nodo == NULL) {
+        perror("Error al reservar memoria para guardar un nodo\n");
         return -1;
     }
+
     nodo->key = key;
     nodo->value1 = value1;
     nodo->N_value2 = N_value2;
@@ -43,6 +46,7 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
 
         base_datos = (Lista *) malloc(sizeof(Lista));
         if (base_datos == NULL) {
+            perror("Error al reservar memoria para la lista de claves\n");
             return -1;
         }
 
@@ -54,8 +58,8 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
     else{
         nodo->siguiente = NULL;
         nodo->index = base_datos->size;
-        base_datos->final->siguiente = nodo;
         base_datos->final = nodo;
+        base_datos->final->siguiente = NULL;
         base_datos->size++;
         return 0;
     }
@@ -63,6 +67,7 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
 
 int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coord *value3){
     if (exist(key) == -1){
+        perror("La clave no existe\n");
         return -1;
     }
     else{
@@ -85,6 +90,7 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
 
 int modify_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
     if (exist(key) == -1 || N_value2 < 1 || N_value2 > 32){
+        perror("La clave no existe o el valor N_value2 debe estar entre 1 y 32\n");
         return -1;
     }
     else{
@@ -114,6 +120,7 @@ int modify_value(int key, char *value1, int N_value2, double *V_value2, struct C
 
 int delete_key(int key){
     if (exist(key) == -1){
+        perror("La clave no existe\n");
         return -1;
     }
     else{
@@ -152,6 +159,7 @@ int delete_key(int key){
 
 int exist(int key){
     if (base_datos == NULL){
+        perror("La lista esta vacia\n");
         return -1;
     }
     else{

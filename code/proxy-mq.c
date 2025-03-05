@@ -17,16 +17,18 @@ int main(void){
     struct mq_attr atributos_cola_c;
     
     // Cola del cliente
-    atributos_cola_c.mq_msgsize = sizeof(Peticion);
+    atributos_cola_c.mq_flags = 0;         
+    atributos_cola_c.mq_maxmsg = 10;
+    atributos_cola_c.mq_msgsize = sizeof(respuesta);
     sprintf(nombre_cola,  "/Cliente-%d", getpid());
-    cola_cliente = mq_open(nombre_cola, O_CREAT | O_RDONLY, 0777, &atributos_cola_c);
+
+    cola_cliente = mq_open(nombre_cola, O_CREAT | O_RDONLY, 0666, &atributos_cola_c);
     if (cola_cliente == -1) {
         perror("Error al abrir la cola del cliente\n");
         return -1;
     }
 
     // Cola del servidor
-    atributos_cola_c.mq_msgsize = sizeof(Peticion);
     cola_servidor = mq_open("/Servidor", O_WRONLY);
     if (cola_servidor == -1) {
         perror("Error al abrir la cola del servidor\n");
@@ -39,36 +41,59 @@ int main(void){
     char *value1 = "hola";  
     int N_value2 = 1;
     double *value2 = NULL;
+
     value2 = (double *)malloc(N_value2 * sizeof(double));
+    if (value2 == NULL) {
+        return -1;
+    }
+
     value2[0] = 1.0;
     struct Coord value3 = {0, 0};
     int operacion = 1;
 
     strcpy(peticion.cola_cliente, nombre_cola);
     peticion.key = key;
+
+    peticion.value1 = (char *)malloc(strlen(value1)+1);
+    if (peticion.value1 == NULL) {
+        perror("Error al reservar memoria en peticion test\n");
+        return -1;
+    }
+
     strcpy(peticion.value1, value1);
-    peticion.value2 = value2;
+
+    peticion.value2 = (double *)malloc(N_value2 * sizeof(double));
+    if (peticion.value2 == NULL) {
+        perror("Error al reservar memoria en peticion test\n");
+        return -1;
+    }
+    memcpy(peticion.value2, value2, N_value2 * sizeof(double));
+
     peticion.N_value2 = N_value2;
     peticion.value3 = value3;
     peticion.operacion = operacion;
 
     if (mq_send(cola_servidor, (char *)&peticion, sizeof(peticion), 0) == -1) {
-        perror("No se puede enviar la peticion");
+        perror("No se puede enviar la peticion\n");
         mq_close(cola_servidor);
         mq_unlink("/Servidor");
     }
 
     // Recibir respuesta en la cola del cliente
-    if(mq_receive(cola_cliente, (char *)&respuesta, sizeof(peticion), 0) == -1) {
-        perror("No se puede recibir la respuesta");
+    if(mq_receive(cola_cliente, (char *)&respuesta, sizeof(respuesta), 0) == -1) {
+        perror("No se puede recibir la respuesta\n");
         mq_close(cola_cliente);
         mq_unlink(nombre_cola);
     }
 
-    printf("Resultado = %d\n", respuesta);
 
 	mq_close(cola_servidor);
 	mq_close(cola_cliente);
     mq_unlink(nombre_cola);
+    printf("Resultado = %d\n", respuesta);
+
+    free(value2);
+    free(peticion.value1);
+    free(peticion.value2);
     return 0;
 }
