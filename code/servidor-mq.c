@@ -51,13 +51,13 @@ void leer_cola(Peticion * peticion) {
     // Enviar la respuesta
     cola_cliente = mq_open(peticion_local.cola_cliente, O_WRONLY);
     if (cola_cliente == -1) {
-        perror("No se puede abrir la cola del cliente\n");
+        perror("ERROR:\nFile: servidor-mq.c\nFunction: leer_cola\nError: No se puede abrir la cola del cliente");
 		mq_close(cola_cliente);
 		mq_unlink(peticion_local.cola_cliente);
     }
     else {
         if (mq_send(cola_cliente, (char *)&respuesta, sizeof(respuesta), 0) == -1) {
-            perror("No se puede enviar la respuesta\n");
+            perror("ERROR:\nFile: servidor-mq.c\nFunction: leer_cola\nError: No se puede enviar la respuesta");
             mq_close(cola_servidor);
             mq_unlink("/Servidor");
         }
@@ -68,7 +68,7 @@ int main(void) {
     // Inicializar la lista de claves
     base_datos = (Lista *) malloc(sizeof(Lista));
     if (base_datos == NULL) {
-        perror("Error al reservar memoria para la lista de claves\n");
+        perror("ERROR:\nFile: servidor-mq.c\nFunction: main\nError: Error al reservar memoria para la lista de claves");
         return -1;
     }
     base_datos->inicio = NULL;
@@ -96,7 +96,7 @@ int main(void) {
     atributos_cola_s.mq_msgsize = sizeof(Peticion);
     cola_servidor = mq_open("/Servidor", O_CREAT | O_RDONLY, 0777, &atributos_cola_s);
     if (cola_servidor == -1) {
-        perror("Error al abrir la cola del servidor\n");
+        perror("ERROR:\nFile: servidor-mq.c\nFunction: main\nError: Error al abrir la cola del servidor");
         return -1;
     }
 
@@ -105,7 +105,7 @@ int main(void) {
 	pthread_attr_setdetachstate(&thread_att, PTHREAD_CREATE_DETACHED);      // threads independientes
     while(1) {
         if (mq_receive(cola_servidor, (char *) &peticion, sizeof(peticion), 0) < 0 ){
-			perror("Error al recibir la peticion\n");
+			perror("ERROR:\nFile: servidor-mq.c\nFunction: main\nError: Error al recibir la peticion");
 			return -1;
 		}
 

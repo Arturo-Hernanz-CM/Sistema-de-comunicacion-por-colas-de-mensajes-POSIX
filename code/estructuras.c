@@ -7,11 +7,11 @@ int comprobar_peticion(void *puntero){
 
     // Comprobación del tamaño del puntero
     if (puntero == NULL){
-        perror("Peticion no válida\n");
+        perror("ERROR:\nFile: estructuras.c\nFunction: comprobar_peticion\nError: Peticion no válida");
         return -1;
     }
     else if(sizeof(Peticion) != sizeof(puntero)){
-        perror("Peticion no válida\n");
+        perror("ERROR:\nFile: estructuras.c\nFunction: comprobar_peticion\nError: Peticion no válida");
         return -1;
     }
 
@@ -21,7 +21,7 @@ int comprobar_peticion(void *puntero){
     op = atoi(peticion->operacion);
     if (op == 0){
         if (strcmp(peticion->operacion, "0") != 0){
-            perror("Peticion no válida\n");
+            perror("ERROR:\nFile: estructuras.c\nFunction: comprobar_peticion\nError: Peticion no válida");
             return -1;
         }
     }
@@ -33,7 +33,7 @@ int comprobar_peticion(void *puntero){
         return op;
     }
     else{
-        perror("Peticion no válida\n");
+        perror("ERROR:\nFile: estructuras.c\nFunction: comprobar_peticion\nError: Peticion no válida");
         return -1;
     }
 }

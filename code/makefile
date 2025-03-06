@@ -33,7 +33,7 @@ $(LIB_NAME): $(OBJS_PROXY)
 
 # Compilar el cliente y vincular la librería
 $(TARGET_CLIENT): $(SRCS_CLIENT)
-	$(CC) $(CFLAGS) -o $(TARGET_CLIENT) $(SRCS_CLIENT) -L. -lproxy
+	$(CC) $(CFLAGS) -o $(TARGET_CLIENT) $(SRCS_CLIENT) -L. -lclaves
 
 # Regla para compilar archivos .c a .o
 %.o: %.c
