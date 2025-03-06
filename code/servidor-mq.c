@@ -13,7 +13,7 @@ pthread_cond_t condicion_mensaje;
 int mensaje_copiado = 0;
 
 
-void *leer_cola(Peticion * peticion) {
+void leer_cola(Peticion * peticion) {
     mqd_t cola_cliente;
     Peticion peticion_local;
     int respuesta;
@@ -109,7 +109,7 @@ int main(void) {
 			return -1;
 		}
 
-        if(pthread_create(&thread, &thread_att, (void *) &leer_cola, &peticion) == 0) {
+        if(pthread_create(&thread, &thread_att, (void*) leer_cola, &peticion) == 0) {
             pthread_mutex_lock(&mutex_mensaje);
             while(mensaje_copiado == 0) {
                 pthread_cond_wait(&condicion_mensaje, &mutex_mensaje);

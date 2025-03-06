@@ -1,15 +1,29 @@
 #include "estructuras.h"
+#include "proxy-mq.h"
 #include <stdio.h> 
 #include <mqueue.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 
-int main(void){
+int tratar_peticion(Peticion* peticion_entrada) {
+
     // Variables
+    int funcion;
     char nombre_cola[256];
     Peticion peticion;
     int respuesta;
+
+    // Comprobar la operación
+    funcion = comprobar_peticion(peticion_entrada);
+    if (funcion == -1){
+        perror("Peticion no válida\n");
+        return -1;
+    }
+
+    // Copiar la peticion de entrada
+    memcpy(&peticion, peticion_entrada, sizeof(Peticion));
+    printf("Peticion recibida: %d\n", peticion.operacion);
 
     // Colas
     mqd_t cola_cliente;
@@ -36,42 +50,6 @@ int main(void){
     }
 
     // Escribir en la cola del servidor
-    // Peticion de test
-    int key = 1;
-    char *value1 = "hola";  
-    int N_value2 = 1;
-    double *value2 = NULL;
-
-    value2 = (double *)malloc(N_value2 * sizeof(double));
-    if (value2 == NULL) {
-        return -1;
-    }
-
-    value2[0] = 1.0;
-    struct Coord value3 = {0, 0};
-    int operacion = 1;
-
-    strcpy(peticion.cola_cliente, nombre_cola);
-    peticion.key = key;
-
-    peticion.value1 = (char *)malloc(strlen(value1)+1);
-    if (peticion.value1 == NULL) {
-        perror("Error al reservar memoria en peticion test\n");
-        return -1;
-    }
-
-    strcpy(peticion.value1, value1);
-
-    peticion.value2 = (double *)malloc(N_value2 * sizeof(double));
-    if (peticion.value2 == NULL) {
-        perror("Error al reservar memoria en peticion test\n");
-        return -1;
-    }
-    memcpy(peticion.value2, value2, N_value2 * sizeof(double));
-
-    peticion.N_value2 = N_value2;
-    peticion.value3 = value3;
-    peticion.operacion = operacion;
 
     if (mq_send(cola_servidor, (char *)&peticion, sizeof(peticion), 0) == -1) {
         perror("No se puede enviar la peticion\n");
@@ -92,8 +70,5 @@ int main(void){
     mq_unlink(nombre_cola);
     printf("Resultado = %d\n", respuesta);
 
-    free(value2);
-    free(peticion.value1);
-    free(peticion.value2);
     return 0;
 }
