@@ -11,14 +11,13 @@ int main (int argc, char **argv){
   // Valores a asignar a la peticion
   int key = 1; 
   char *v1 = "ejemplo de valor 1";
-  peticion.value1 = (char *) malloc(strlen(v1) + 1);
   double v2[] = {1.0, 0.5}; 
   struct Coord v3;
   v3.x = 5; 
   v3.y = 10; 
 
   // Asignacion de valores a la estructura
-  memcpy(peticion.value1, v1, strlen(v1) + 1);
+  memcpy(peticion.value1, &v1, strlen(v1) + 1);
   peticion.key = key;
   peticion.N_value2 = 2;
   memcpy(&peticion.value2, v2, sizeof(double));
@@ -32,6 +31,5 @@ int main (int argc, char **argv){
     return -1;
   } 
  
-  free(peticion.value1);
   return 0;  
 }

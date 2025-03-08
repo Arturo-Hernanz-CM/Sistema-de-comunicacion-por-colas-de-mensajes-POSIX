@@ -4,6 +4,7 @@
 #include <mqueue.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Variables globales
 Lista * base_datos = NULL;
@@ -14,13 +15,17 @@ int mensaje_copiado = 0;
 
 
 void leer_cola(Peticion * peticion) {
+    if(peticion == NULL) {
+        perror("ERROR:\nFile: servidor-mq.c\nFunction: leer_cola\nError: Peticion no valida");
+        return;
+    }
     mqd_t cola_cliente;
     Peticion peticion_local;
     int respuesta;
 
     // Copiar la petición a local
-    pthread_mutex_lock(&mutex_mensaje); 
-    peticion_local = *peticion;
+    pthread_mutex_lock(&mutex_mensaje);
+    memcpy(&peticion_local, peticion, sizeof(Peticion));
     mensaje_copiado = 1;
     pthread_cond_signal(&condicion_mensaje);
     pthread_mutex_unlock(&mutex_mensaje);
@@ -33,7 +38,19 @@ void leer_cola(Peticion * peticion) {
         respuesta = set_value(peticion_local.key, peticion_local.value1, peticion_local.N_value2, peticion_local.value2, peticion_local.value3);
     }
     else if (peticion_local.operacion == 2) {
-        respuesta = get_value(peticion_local.key, peticion_local.value1, &peticion_local.N_value2, peticion_local.value2, &peticion_local.value3);
+        char *v1 = NULL;
+        int *nv2 = NULL;
+        double *v2 = NULL;
+        struct Coord *v3 = NULL;
+        respuesta = get_value(peticion_local.key, v1, nv2, v2, v3);
+        Peticion resp;
+        resp.key = peticion_local.key;
+        strcpy(resp.value1, v1);
+        printf("aa\n");
+        resp.N_value2 = *nv2;
+        memcpy(resp.value2, v2, sizeof(double));
+        resp.value3 = *v3;
+        printf("%s\n", resp.value1);
     }
     else if (peticion_local.operacion == 3) {
         respuesta = modify_value(peticion_local.key, peticion_local.value1, peticion_local.N_value2, peticion_local.value2, peticion_local.value3);
@@ -57,11 +74,21 @@ void leer_cola(Peticion * peticion) {
 		mq_unlink(peticion_local.cola_cliente);
     }
     else {
-        if (mq_send(cola_cliente, (char *)&respuesta, sizeof(respuesta), 0) == -1) {
-            perror("ERROR:\nFile: servidor-mq.c\nFunction: leer_cola\nError: No se puede enviar la respuesta");
-            mq_close(cola_servidor);
-            mq_unlink("/Servidor");
+        if(peticion_local.operacion == 2) {
+            if (mq_send(cola_cliente, (char *)&peticion_local, sizeof(Peticion), 0) == -1) {
+                perror("ERROR:\nFile: servidor-mq.c\nFunction: leer_cola\nError: No se puede enviar la respuesta");
+                mq_close(cola_servidor);
+                mq_unlink("/Servidor");
+            }  
         }
+        else{
+          if (mq_send(cola_cliente, (char *)&respuesta, sizeof(respuesta), 0) == -1) {
+                perror("ERROR:\nFile: servidor-mq.c\nFunction: leer_cola\nError: No se puede enviar la respuesta");
+                mq_close(cola_servidor);
+                mq_unlink("/Servidor");
+            }  
+        }
+        
     }
 }
 
@@ -102,14 +129,12 @@ int main(void) {
     }
 
     // Escribir en la cola
-
 	pthread_attr_setdetachstate(&thread_att, PTHREAD_CREATE_DETACHED);      // threads independientes
     while(1) {
-        if (mq_receive(cola_servidor, (char *) &peticion, sizeof(peticion), 0) < 0 ){
+        if (mq_receive(cola_servidor, (char *) &peticion, sizeof(Peticion), 0) < 0 ){
 			perror("ERROR:\nFile: servidor-mq.c\nFunction: main\nError: Error al recibir la peticion");
 			return -1;
 		}
-
         if(pthread_create(&thread, &thread_att, (void*) leer_cola, &peticion) == 0) {
             pthread_mutex_lock(&mutex_mensaje);
             while(mensaje_copiado == 0) {

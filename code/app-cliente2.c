@@ -14,8 +14,6 @@ int main (int argc, char **argv){
 
   // Asignacion de valores a la estructura
   peticion.key = key;
-  peticion.value1 = NULL;
-  peticion.value2 = NULL;
   peticion.N_value2 = 0;
   peticion.value3 = value3;
   peticion.operacion = 2;   // get_value
@@ -26,8 +24,8 @@ int main (int argc, char **argv){
     printf("Error al insertar la tupla\n"); 
     return -1;
   } 
- 
-  free(peticion.value1);
-  free(peticion.value2);
+
+  printf("%s\n", peticion.value1);
+
   return 0; 
 }

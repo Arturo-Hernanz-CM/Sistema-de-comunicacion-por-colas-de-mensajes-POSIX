@@ -25,7 +25,7 @@ int tratar_peticion(Peticion* peticion_entrada) {
     memcpy(&peticion, peticion_entrada, sizeof(Peticion));
 
     //debug
-    printf("Peticion recibida: %d\n", peticion.operacion);
+    printf("Peticion a enviar: %s\n", peticion.value1);
 
     // Colas
     mqd_t cola_cliente;
@@ -35,7 +35,12 @@ int tratar_peticion(Peticion* peticion_entrada) {
     // Cola del cliente
     atributos_cola_c.mq_flags = 0;         
     atributos_cola_c.mq_maxmsg = 10;
-    atributos_cola_c.mq_msgsize = sizeof(respuesta);
+    if(peticion.operacion == 2){
+        atributos_cola_c.mq_msgsize = sizeof(Peticion);
+    }
+    else{
+        atributos_cola_c.mq_msgsize = sizeof(respuesta);
+    }
     sprintf(nombre_cola,  "/Cliente-%d", getpid());
     strcpy(peticion.cola_cliente, nombre_cola);
 
@@ -53,18 +58,30 @@ int tratar_peticion(Peticion* peticion_entrada) {
     }
 
     // Escribir en la cola del servidor
-    if (mq_send(cola_servidor, (char *)&peticion, sizeof(peticion), 0) == -1) {
+    if (mq_send(cola_servidor, (char *) &peticion, sizeof(Peticion), 0) == -1) {
         perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: No se puede enviar la peticion");
         mq_close(cola_servidor);
         mq_unlink("/Servidor");
     }
 
     // Recibir respuesta en la cola del cliente
-    if(mq_receive(cola_cliente, (char *)&respuesta, sizeof(respuesta), 0) == -1) {
-        perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: No se puede recibir la respuesta");
-        mq_close(cola_cliente);
-        mq_unlink(nombre_cola);
+    if (peticion.operacion == 2){
+        Peticion resp;
+        if(mq_receive(cola_cliente, (char *)&resp, sizeof(Peticion), 0) == -1) {
+            perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: No se puede recibir la respuesta");
+            mq_close(cola_cliente);
+            mq_unlink(nombre_cola);
+        }
+        printf("%s\n", resp.value1);
     }
+    else{
+        if(mq_receive(cola_cliente, (char *)&respuesta, sizeof(respuesta), 0) == -1) {
+            perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: No se puede recibir la respuesta");
+            mq_close(cola_cliente);
+            mq_unlink(nombre_cola);
+        }
+    }
+    
 
 
 	mq_close(cola_servidor);

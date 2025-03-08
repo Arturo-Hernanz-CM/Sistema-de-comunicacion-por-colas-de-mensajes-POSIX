@@ -35,9 +35,21 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
     }
 
     nodo->key = key;
-    nodo->value1 = value1;
+    nodo->value1 = (char*)malloc(strlen(value1)+1);
+    if (nodo->value1 == NULL) {
+        perror("ERROR:\nFile: claves.c\nFunction: set_value\nError: Error al reservar memoria para guardar el value1");
+        return -1;
+    }
+    strcpy(nodo->value1, value1);
+
     nodo->N_value2 = N_value2;
-    nodo->value2 = V_value2;
+
+    nodo->value2 = (double*)malloc(N_value2*sizeof(double));
+    if (nodo->value2 == NULL) {
+        perror("ERROR:\nFile: claves.c\nFunction: set_value\nError: Error al reservar memoria para guardar el value2");
+        return -1;
+    }
+    memcpy(&nodo->value2, V_value2, sizeof(double));
     nodo->value3 = value3;
 
     if (base_datos->size == 0){ // lista vacia
@@ -73,7 +85,6 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
     else{
         Nodo *nodo_actual = base_datos->inicio;
         for(int indice = 0; indice < base_datos->size; indice++){
-            printf("a\n");
             if(nodo_actual->key == key){
                 value1 = (char*)malloc(strlen(nodo_actual->value1)+1);
                 if (value1 == NULL) {
@@ -88,7 +99,7 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
                 }
 
                 strcpy(value1, nodo_actual->value1);
-                *N_value2 = nodo_actual->N_value2;
+                memcpy(V_value2, &nodo_actual->value2, sizeof(nodo_actual->value2));
                 memcpy(V_value2, &nodo_actual->value2, sizeof(nodo_actual->value2));
                 value3->x = nodo_actual->value3.x;
                 value3->y = nodo_actual->value3.y;
@@ -159,6 +170,8 @@ int delete_key(int key){
                     nodo_anterior->siguiente = nodo_actual->siguiente;
                 }
                 base_datos->size--;
+                free(nodo_actual->value1);
+                free(nodo_actual->value2);
                 free(nodo_actual);
                 return 0;
             }

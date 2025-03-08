@@ -14,8 +14,6 @@ int main (int argc, char **argv){
 
   // Asignacion de valores a la estructura
   peticion.key = key;
-  peticion.value1 = NULL;
-  peticion.value2 = NULL;
   peticion.N_value2 = 0;
   peticion.value3 = value3;
   peticion.operacion = 4;   // delete_key

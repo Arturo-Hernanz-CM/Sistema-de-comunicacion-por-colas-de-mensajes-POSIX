@@ -6,7 +6,7 @@ typedef struct Nodo{
     int index;
     
     int key;
-    char *value1;  // le paso la dir. mem. de un vector para no definir el tamaño máximo
+    char *value1;
     int N_value2;
     double *value2;
     struct Coord value3; 
@@ -22,9 +22,9 @@ typedef struct{
 
 typedef struct{
     int key;
-    char *value1;  
+    char value1[256];  
     int N_value2;
-    double *value2;
+    double value2[32];
     struct Coord value3;
     int operacion;
     /*
