@@ -10,7 +10,7 @@ Peticion peticion;
 int main (int argc, char **argv){
   // Valores a asignar a la peticion
   int key = 1;
-  struct Coord value3 = {NULL, NULL};
+  struct Coord value3 = {0, 0};
 
   // Asignacion de valores a la estructura
   peticion.key = key;

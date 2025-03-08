@@ -9,10 +9,11 @@ Peticion peticion;
 // Ejemplo 0 -> destroy
 int main (int argc, char **argv){
   // Valores a asignar a la peticion
-  struct Coord value3 = {NULL, NULL};
+  int key = 0;
+  struct Coord value3 = {0, 0};
   
   // Asignacion de valores a la estructura
-  peticion.key = NULL;
+  peticion.key = key;
   peticion.value1 = NULL;
   peticion.value2 = NULL;
   peticion.N_value2 = 0;
