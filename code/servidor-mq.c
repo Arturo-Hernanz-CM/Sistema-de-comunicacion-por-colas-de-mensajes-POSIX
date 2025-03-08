@@ -33,23 +33,23 @@ void leer_cola(Peticion * peticion) {
         respuesta = set_value(peticion_local.key, peticion_local.value1, peticion_local.N_value2, peticion_local.value2, peticion_local.value3);
     }
     else if (peticion_local.operacion == 2) {
-        respuesta = modify_value(peticion_local.key, peticion_local.value1, peticion_local.N_value2, peticion_local.value2, peticion_local.value3);
+        respuesta = get_value(peticion_local.key, peticion_local.value1, &peticion_local.N_value2, peticion_local.value2, &peticion_local.value3);
     }
     else if (peticion_local.operacion == 3) {
-        respuesta = delete_key(peticion_local.key);
+        respuesta = modify_value(peticion_local.key, peticion_local.value1, peticion_local.N_value2, peticion_local.value2, peticion_local.value3);
     }
     else if (peticion_local.operacion == 4) {
-        respuesta = exist(peticion_local.key);
+        respuesta = delete_key(peticion_local.key);
     }
     else if (peticion_local.operacion == 5) {
-        respuesta = get_value(peticion_local.key, peticion_local.value1, &peticion_local.N_value2, peticion_local.value2, &peticion_local.value3);
+        respuesta = exist(peticion_local.key);
     }
     else {
         respuesta = -1;
     }
 
     // Enviar la respuesta
-    printf("%s\n", peticion_local.cola_cliente);
+    printf("Respuesta a: %s\n", peticion_local.cola_cliente);
     cola_cliente = mq_open(peticion_local.cola_cliente, O_WRONLY);
     if (cola_cliente == -1) {
         perror("ERROR:\nFile: servidor-mq.c\nFunction: leer_cola\nError: No se puede abrir la cola del cliente");

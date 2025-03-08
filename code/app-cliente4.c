@@ -26,7 +26,6 @@ int main (int argc, char **argv){
     printf("Error al insertar la tupla\n"); 
     return -1;
   } 
- 
-  free(peticion.value1);
+
   return 0; 
 }

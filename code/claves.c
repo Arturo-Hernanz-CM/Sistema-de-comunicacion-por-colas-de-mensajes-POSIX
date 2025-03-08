@@ -24,13 +24,13 @@ int destroy(void){
 
 int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
     if(N_value2 < 1 || N_value2 > 32){
-        perror("El valor N_value2 debe estar entre 1 y 32\n");
+        perror("ERROR:\nFile: claves.c\nFunction: set_value\nError: El valor N_value2 debe estar entre 1 y 32");
         return -1;
     }
 
     Nodo *nodo = (Nodo *) malloc(sizeof(Nodo));
     if (nodo == NULL) {
-        perror("Error al reservar memoria para guardar un nodo\n");
+        perror("ERROR:\nFile: claves.c\nFunction: set_value\nError: Error al reservar memoria para guardar un nodo");
         return -1;
     }
 
@@ -40,13 +40,13 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
     nodo->value2 = V_value2;
     nodo->value3 = value3;
 
-    if (base_datos == NULL){ // lista vacia
+    if (base_datos->size == 0){ // lista vacia
         nodo->siguiente = NULL;
         nodo->index = 0;
 
         base_datos = (Lista *) malloc(sizeof(Lista));
         if (base_datos == NULL) {
-            perror("Error al reservar memoria para la lista de claves\n");
+            perror("ERROR:\nFile: claves.c\nFunction: set_value\nError: Error al reservar memoria para la lista de claves");
             return -1;
         }
 
@@ -67,17 +67,31 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
 
 int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coord *value3){
     if (exist(key) == -1){
-        perror("La clave no existe\n");
+        perror("ERROR:\nFile: claves.c\nFunction: get_value\nError: La clave no existe");
         return -1;
     }
     else{
         Nodo *nodo_actual = base_datos->inicio;
         for(int indice = 0; indice < base_datos->size; indice++){
+            printf("a\n");
             if(nodo_actual->key == key){
+                value1 = (char*)malloc(strlen(nodo_actual->value1)+1);
+                if (value1 == NULL) {
+                    perror("ERROR:\nFile: claves.c\nFunction: get_value\nError: Error al reservar memoria para value1");
+                    return -1;
+                }
+
+                V_value2 = (double*)malloc(sizeof(nodo_actual->value2));
+                if (V_value2 == NULL) {
+                    perror("ERROR:\nFile: claves.c\nFunction: get_value\nError: Error al reservar memoria para value1");
+                    return -1;
+                }
+
                 strcpy(value1, nodo_actual->value1);
                 *N_value2 = nodo_actual->N_value2;
-                V_value2 = nodo_actual->value2;
-                *value3 = nodo_actual->value3;
+                memcpy(V_value2, &nodo_actual->value2, sizeof(nodo_actual->value2));
+                value3->x = nodo_actual->value3.x;
+                value3->y = nodo_actual->value3.y;
                 return 0;
             }
             else{
@@ -90,7 +104,7 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
 
 int modify_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
     if (exist(key) == -1 || N_value2 < 1 || N_value2 > 32){
-        perror("La clave no existe o el valor N_value2 debe estar entre 1 y 32\n");
+        perror("ERROR:\nFile: claves.c\nFunction: modify_value\nError: La clave no existe o el valor N_value2 debe estar entre 1 y 32");
         return -1;
     }
     else{
@@ -120,7 +134,7 @@ int modify_value(int key, char *value1, int N_value2, double *V_value2, struct C
 
 int delete_key(int key){
     if (exist(key) == -1){
-        perror("La clave no existe\n");
+        perror("ERROR:\nFile: claves.c\nFunction: delete_key\nError: La clave no existe");
         return -1;
     }
     else{
@@ -159,7 +173,7 @@ int delete_key(int key){
 
 int exist(int key){
     if (base_datos == NULL){
-        perror("La lista esta vacia\n");
+        perror("ERROR:\nFile: claves.c\nFunction: exist\nError: La lista esta vacia");
         return -1;
     }
     else{
@@ -169,7 +183,12 @@ int exist(int key){
                 return 0;
             }
             else{
-                nodo_actual = nodo_actual->siguiente;
+                if(nodo_actual != base_datos->final){
+                    nodo_actual = nodo_actual->siguiente;
+                }
+                else{
+                    return -1;
+                }
             }
         }
         return -1;

@@ -12,6 +12,10 @@ int main (int argc, char **argv){
   int key = 1; 
   char *v1 = "ejemplo de valor 1";
   peticion.value1 = (char *) malloc(strlen(v1) + 1);
+  if (peticion.value1 == NULL) {
+    printf("ERROR:\nFile: app-cliente2.c\nFunction: main\nError: Error al reservar memoria\n");
+    return -1;
+  }
   double v2[] = {2.3, 0.5, 23.45}; 
   struct Coord v3;
   v3.x = 10; 
