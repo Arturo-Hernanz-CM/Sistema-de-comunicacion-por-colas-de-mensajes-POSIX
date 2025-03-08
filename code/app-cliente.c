@@ -1,33 +1,36 @@
+#include "estructuras.h"
+#include "proxy-mq.h"
 #include <stdio.h> 
 #include <string.h>
- 
-// numero de argumentos: 2, 3, 7
+#include <stdlib.h>
+
+Peticion peticion;
+
 int main (int argc, char **argv)  {
-  // Comprobacion de argumentos
-  if (argc != 2 && argc != 3 && argc != 7){
-    perror("ERROR:\nFile: app-cliente.c\nFunction: main\nError: Número de argumentos incorrecto, debe ser 1, 2 o 6");
+  // Ejemplo 1
+  char *v1 = "ejemplo de valor 1";
+  struct Coord v3; 
+  peticion.value1 = (char *) malloc(strlen(v1) + 1);
+
+  int key = 5; 
+  double v2[] = {2.3, 0.5, 23.45}; 
+ 
+  v3.x = 10; 
+  v3.y = 5; 
+
+  memcpy(peticion.value1, v1, strlen(v1) + 1);
+  peticion.key = key;
+  peticion.N_value2 = 3;
+  memcpy(&peticion.value2, v2, sizeof(double));
+  peticion.value3 = v3;
+  peticion.operacion = 1;
+  
+  int err = tratar_peticion(&peticion); 
+  if (err == -1) { 
+    printf("Error al insertar la tupla\n"); 
     return -1;
-  }
-
-  // Funciones
-  if (argc == 2){   // destroy
-    if (strcmp(argv[1], "destroy") != 0){
-      perror("ERROR:\nFile: app-cliente.c\nFunction: main\nError: Argumento incorrecto");
-      return -1;
-    }
-  }
-  else if (argc == 3){    // delete_key o esist
-    if (strcmp(argv[1], "delete_key") != 0 && strcmp(argv[1], "exist") != 0){
-      perror("ERROR:\nFile: app-cliente.c\nFunction: main\nError: Argumento incorrecto");
-      return -1;
-    }
-  }
-  else if (argc == 7){
-    if (strcmp(argv[1], "set_value") != 0 && strcmp(argv[1], "modify_value") != 0 && strcmp(argv[1], "get_value") != 0){
-      perror("ERROR:\nFile: app-cliente.c\nFunction: main\nError: Argumento incorrecto");
-      return -1;
-    }
-  }
-
+  } 
+ 
+  free(peticion.value1);
   return 0; 
-} 
+}

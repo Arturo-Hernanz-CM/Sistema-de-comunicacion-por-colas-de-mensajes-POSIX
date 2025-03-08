@@ -1,5 +1,5 @@
-#include "estructuras.h"
 #include "proxy-mq.h"
+#include "estructuras.h"
 #include <stdio.h> 
 #include <mqueue.h>
 #include <unistd.h>
@@ -37,6 +37,7 @@ int tratar_peticion(Peticion* peticion_entrada) {
     atributos_cola_c.mq_maxmsg = 10;
     atributos_cola_c.mq_msgsize = sizeof(respuesta);
     sprintf(nombre_cola,  "/Cliente-%d", getpid());
+    strcpy(peticion.cola_cliente, nombre_cola);
 
     cola_cliente = mq_open(nombre_cola, O_CREAT | O_RDONLY, 0666, &atributos_cola_c);
     if (cola_cliente == -1) {
@@ -52,7 +53,6 @@ int tratar_peticion(Peticion* peticion_entrada) {
     }
 
     // Escribir en la cola del servidor
-
     if (mq_send(cola_servidor, (char *)&peticion, sizeof(peticion), 0) == -1) {
         perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: No se puede enviar la peticion");
         mq_close(cola_servidor);

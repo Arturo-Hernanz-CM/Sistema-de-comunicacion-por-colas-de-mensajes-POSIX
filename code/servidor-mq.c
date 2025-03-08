@@ -49,6 +49,7 @@ void leer_cola(Peticion * peticion) {
     }
 
     // Enviar la respuesta
+    printf("%s\n", peticion_local.cola_cliente);
     cola_cliente = mq_open(peticion_local.cola_cliente, O_WRONLY);
     if (cola_cliente == -1) {
         perror("ERROR:\nFile: servidor-mq.c\nFunction: leer_cola\nError: No se puede abrir la cola del cliente");
