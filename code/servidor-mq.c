@@ -21,6 +21,7 @@ void leer_cola(Peticion * peticion) {
     }
     mqd_t cola_cliente;
     Peticion peticion_local;
+    Peticion resp;
     int respuesta;
 
     // Copiar la petición a local
@@ -38,19 +39,16 @@ void leer_cola(Peticion * peticion) {
         respuesta = set_value(peticion_local.key, peticion_local.value1, peticion_local.N_value2, peticion_local.value2, peticion_local.value3);
     }
     else if (peticion_local.operacion == 2) {
-        char *v1 = NULL;
-        int *nv2 = NULL;
-        double *v2 = NULL;
-        struct Coord *v3 = NULL;
-        respuesta = get_value(peticion_local.key, v1, nv2, v2, v3);
-        Peticion resp;
+        char v1[256];
+        int nv2 = 0;
+        double v2[32];
+        struct Coord v3;
+        respuesta = get_value(peticion_local.key, v1, &nv2, v2, &v3);
         resp.key = peticion_local.key;
         strcpy(resp.value1, v1);
-        printf("aa\n");
-        resp.N_value2 = *nv2;
+        resp.N_value2 = nv2;
         memcpy(resp.value2, v2, sizeof(double));
-        resp.value3 = *v3;
-        printf("%s\n", resp.value1);
+        resp.value3 = v3;
     }
     else if (peticion_local.operacion == 3) {
         respuesta = modify_value(peticion_local.key, peticion_local.value1, peticion_local.N_value2, peticion_local.value2, peticion_local.value3);
@@ -75,7 +73,7 @@ void leer_cola(Peticion * peticion) {
     }
     else {
         if(peticion_local.operacion == 2) {
-            if (mq_send(cola_cliente, (char *)&peticion_local, sizeof(Peticion), 0) == -1) {
+            if (mq_send(cola_cliente, (char *)&resp, sizeof(Peticion), 0) == -1) {
                 perror("ERROR:\nFile: servidor-mq.c\nFunction: leer_cola\nError: No se puede enviar la respuesta");
                 mq_close(cola_servidor);
                 mq_unlink("/Servidor");

@@ -86,18 +86,6 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
         Nodo *nodo_actual = base_datos->inicio;
         for(int indice = 0; indice < base_datos->size; indice++){
             if(nodo_actual->key == key){
-                value1 = (char*)malloc(strlen(nodo_actual->value1)+1);
-                if (value1 == NULL) {
-                    perror("ERROR:\nFile: claves.c\nFunction: get_value\nError: Error al reservar memoria para value1");
-                    return -1;
-                }
-
-                V_value2 = (double*)malloc(sizeof(nodo_actual->value2));
-                if (V_value2 == NULL) {
-                    perror("ERROR:\nFile: claves.c\nFunction: get_value\nError: Error al reservar memoria para value1");
-                    return -1;
-                }
-
                 strcpy(value1, nodo_actual->value1);
                 memcpy(V_value2, &nodo_actual->value2, sizeof(nodo_actual->value2));
                 memcpy(V_value2, &nodo_actual->value2, sizeof(nodo_actual->value2));
@@ -170,8 +158,6 @@ int delete_key(int key){
                     nodo_anterior->siguiente = nodo_actual->siguiente;
                 }
                 base_datos->size--;
-                free(nodo_actual->value1);
-                free(nodo_actual->value2);
                 free(nodo_actual);
                 return 0;
             }
