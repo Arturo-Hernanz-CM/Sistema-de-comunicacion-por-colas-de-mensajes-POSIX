@@ -7,7 +7,6 @@ CFLAGS = -Wall -g -fPIC -pthread -lrt
 # Archivos fuente
 SRCS_SERVER = servidor-mq.c claves.c
 SRCS_PROXY = proxy-mq.c
-SRCS_STRUCT = estructuras.c
 SRCS_CLIENT0 = app-cliente0.c
 SRCS_CLIENT1 = app-cliente1.c
 SRCS_CLIENT2 = app-cliente2.c
@@ -18,7 +17,6 @@ SRCS_CLIENT5 = app-cliente5.c
 # Archivos objeto
 OBJS_SERVER = $(SRCS_SERVER:.c=.o)
 OBJS_PROXY = $(SRCS_PROXY:.c=.o)
-OBJS_STRUCT = $(SRCS_STRUCT:.c=.o)
 
 # Librería compartida
 LIB_NAME = libclaves.so
@@ -40,8 +38,8 @@ $(TARGET_SERVER): $(OBJS_SERVER)
 	$(CC) $(CFLAGS) -o $(TARGET_SERVER) $(OBJS_SERVER)
 
 # Crear la librería compartida
-$(LIB_NAME): $(OBJS_PROXY) $(OBJS_STRUCT)
-	$(CC) -shared -o $(LIB_NAME) $(OBJS_PROXY) $(OBJS_STRUCT)
+$(LIB_NAME): $(OBJS_PROXY)
+	$(CC) -shared -o $(LIB_NAME) $(OBJS_PROXY)
 
 # Compilar los clientes y vincular la librería
 $(TARGET_CLIENT0): $(SRCS_CLIENT0)
@@ -68,4 +66,4 @@ $(TARGET_CLIENT5): $(SRCS_CLIENT5)
 
 # Limpiar archivos generados
 clean:
-	rm -f $(OBJS_SERVER) $(OBJS_PROXY) $(OBJS_STRUCT) $(TARGET_SERVER) $(TARGET_CLIENT0) $(TARGET_CLIENT1) $(TARGET_CLIENT2) $(TARGET_CLIENT3) $(TARGET_CLIENT4) $(TARGET_CLIENT5) $(LIB_NAME)
+	rm -f $(OBJS_SERVER) $(OBJS_PROXY) $(TARGET_SERVER) $(TARGET_CLIENT0) $(TARGET_CLIENT1) $(TARGET_CLIENT2) $(TARGET_CLIENT3) $(TARGET_CLIENT4) $(TARGET_CLIENT5) $(LIB_NAME)

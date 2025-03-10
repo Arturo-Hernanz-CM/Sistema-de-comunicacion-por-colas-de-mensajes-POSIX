@@ -10,26 +10,18 @@ Peticion peticion;
 int main (int argc, char **argv){
   // Valores a asignar a la peticion
   int key = 1; 
-  char *v1 = "ejemplo de valor 1";
+  char *v1 = "ejemplo de valor 2";
   double v2[] = {1.0, 0.5}; 
   struct Coord v3;
   v3.x = 5; 
   v3.y = 10; 
-
-  // Asignacion de valores a la estructura
-  memcpy(peticion.value1, &v1, strlen(v1) + 1);
-  peticion.key = key;
-  peticion.N_value2 = 2;
-  memcpy(&peticion.value2, v2, sizeof(double));
-  peticion.value3 = v3;
-  peticion.operacion = 3;   // modify_value
   
   // Envio de peticion
-  int err = tratar_peticion(&peticion); 
+  int err = modify_value(key, v1, 2, v2, v3); 
   if (err == -1) { 
-    printf("Error al insertar la tupla\n"); 
+    perror("ERROR:\nFile: app-cliente3.c\nFunction: main\nError al insertar la tupla"); 
     return -1;
-  } 
- 
+  }
+  
   return 0;  
 }

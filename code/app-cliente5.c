@@ -10,18 +10,11 @@ Peticion peticion;
 int main (int argc, char **argv){
   // Valores a asignar a la peticion
   int key = 1;
-  struct Coord value3 = {0, 0};
-
-  // Asignacion de valores a la estructura
-  peticion.key = key;
-  peticion.N_value2 = 0;
-  peticion.value3 = value3;
-  peticion.operacion = 5;   // exist
   
   // Envio de peticion
-  int err = tratar_peticion(&peticion); 
+  int err = exist(key); 
   if (err == -1) { 
-    printf("Error al insertar la tupla\n"); 
+    perror("ERROR:\nFile: app-cliente5.c\nFunction: main\nError al insertar la tupla"); 
     return -1;
   } 
   

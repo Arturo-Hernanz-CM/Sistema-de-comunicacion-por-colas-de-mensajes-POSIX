@@ -6,23 +6,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-int tratar_peticion(Peticion* peticion_entrada) {
+// Variable global
+Peticion peticion;
+
+// Funciones
+
+int tratar_peticion(Peticion peticion) {
 
     // Variables
-    int funcion;
     char nombre_cola[256];
-    Peticion peticion;
     int respuesta;
-
-    // Comprobar la operación
-    funcion = comprobar_peticion(peticion_entrada);
-    if (funcion == -1){
-        perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: Peticion no válida");
-        return -1;
-    }
-
-    // Copiar la peticion de entrada
-    memcpy(&peticion, peticion_entrada, sizeof(Peticion));
 
     //debug
     printf("Peticion a enviar: %s\n", peticion.value1);
@@ -73,6 +66,7 @@ int tratar_peticion(Peticion* peticion_entrada) {
             mq_unlink(nombre_cola);
         }
         printf("%s\n", resp.value1);
+        respuesta = 0;
     }
     else{
         if(mq_receive(cola_cliente, (char *)&respuesta, sizeof(respuesta), 0) == -1) {
@@ -82,8 +76,6 @@ int tratar_peticion(Peticion* peticion_entrada) {
         }
     }
     
-
-
 	mq_close(cola_servidor);
 	mq_close(cola_cliente);
     mq_unlink(nombre_cola);
@@ -91,5 +83,93 @@ int tratar_peticion(Peticion* peticion_entrada) {
     //debug
     printf("Resultado = %d\n", respuesta);
 
+    return 0;
+}
+
+int destroy(void){
+    // Valores a asignar a la peticion
+    struct Coord value3 = {0, 0};
+
+    // Asignacion de valores a la estructura
+    peticion.key = 0;
+    peticion.N_value2 = 0;
+    peticion.value3 = value3;
+    peticion.operacion = 0;
+
+    if (tratar_peticion(peticion) == -1){
+        return -1;
+    }
+    return 0;
+}
+int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
+    // Asignacion de valores a la estructura
+    peticion.key = key;
+    strcpy(peticion.value1, value1);
+    peticion.N_value2 = N_value2;
+    memcpy(&peticion.value2, V_value2, sizeof(double));
+    peticion.value3 = value3;
+    peticion.operacion = 1;
+
+    if (tratar_peticion(peticion) == -1){
+        return -1;
+    }
+    return 0;
+}
+int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coord *value3){
+    // Asignacion de valores a la estructura
+    peticion.key = key;
+    strcpy(peticion.value1, value1);
+    peticion.N_value2 = 0;
+    peticion.value3 = *value3;
+    memcpy(&peticion.value3, value3, sizeof(struct Coord));
+    peticion.operacion = 2;
+
+    if (tratar_peticion(peticion) == -1){
+        return -1;
+    }
+    return 0;
+}
+int modify_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
+    // Asignacion de valores a la estructura
+    peticion.key = key;
+    strcpy(peticion.value1, value1);
+    peticion.N_value2 = 2;
+    memcpy(&peticion.value2, V_value2, sizeof(double));
+    peticion.value3 = value3;
+    peticion.operacion = 3;
+
+    if (tratar_peticion(peticion) == -1){
+        return -1;
+    }
+    return 0;
+}
+int delete_key(int key){
+    // Valores a asignar a la peticion
+    struct Coord value3 = {0, 0};
+
+    // Asignacion de valores a la estructura
+    peticion.key = key;
+    peticion.N_value2 = 0;
+    peticion.value3 = value3;
+    peticion.operacion = 4;
+    
+    if (tratar_peticion(peticion) == -1){
+        return -1;
+    }
+    return 0;
+}
+int exist(int key){
+    // Valores a asignar a la peticion
+    struct Coord value3 = {0, 0};
+
+    // Asignacion de valores a la estructura
+    peticion.key = key;
+    peticion.N_value2 = 0;
+    peticion.value3 = value3;
+    peticion.operacion = 5; 
+
+    if (tratar_peticion(peticion) == -1){
+        return -1;
+    }
     return 0;
 }

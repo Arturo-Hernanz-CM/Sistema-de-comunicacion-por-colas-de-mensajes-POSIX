@@ -68,6 +68,10 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
         return 0;
     }
     else{
+        if(exist(key) == 0){
+            perror("ERROR:\nFile: claves.c\nFunction: set_value\nError: La clave ya existe en la base de datos");
+            return -1;
+        }
         nodo->siguiente = NULL;
         nodo->index = base_datos->size;
         base_datos->final = nodo;
@@ -110,8 +114,8 @@ int modify_value(int key, char *value1, int N_value2, double *V_value2, struct C
         Nodo *nodo_actual = base_datos->inicio;
         for(int indice = 0; indice < base_datos->size; indice++){
             if(nodo_actual->key == key){
-                nodo_actual = (Nodo*)malloc(strlen(value1)+1);
-                if (nodo_actual == NULL) {
+                nodo_actual->value1 = (char*)malloc(strlen(value1)+1);
+                if (nodo_actual->value1 == NULL) {
                     return -1;
                 }
                 else{

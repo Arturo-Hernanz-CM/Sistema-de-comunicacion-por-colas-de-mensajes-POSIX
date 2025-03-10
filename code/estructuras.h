@@ -39,6 +39,4 @@ typedef struct{
     char cola_cliente[256];
 }Peticion;
 
-int comprobar_peticion(void *puntero);
-
 #endif

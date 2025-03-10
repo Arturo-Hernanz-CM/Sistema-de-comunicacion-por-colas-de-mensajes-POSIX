@@ -14,21 +14,12 @@ int main (int argc, char **argv){
   double v2[] = {2.3, 0.5, 23.45}; 
   struct Coord v3;
   v3.x = 10; 
-  v3.y = 5; 
-
-  // Asignacion de valores a la estructura
-  strcpy(peticion.value1, v1);
-  printf("%s\n", peticion.value1);
-  peticion.key = key;
-  peticion.N_value2 = 3;
-  memcpy(&peticion.value2, v2, sizeof(double));
-  peticion.value3 = v3;
-  peticion.operacion = 1;   // set_value
+  v3.y = 5;
   
   // Envio de peticion
-  int err = tratar_peticion(&peticion); 
+  int err = set_value(key, v1, 3, v2, v3); 
   if (err == -1) { 
-    printf("Error al insertar la tupla\n"); 
+    perror("ERROR:\nFile: app-cliente1.c\nFunction: main\nError al insertar la tupla"); 
     return -1;
   } 
  
