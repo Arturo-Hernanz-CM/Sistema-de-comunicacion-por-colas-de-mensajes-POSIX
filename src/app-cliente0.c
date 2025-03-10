@@ -8,11 +8,7 @@
 int main (int argc, char **argv){
    
   // Envio de peticion 
-  int err = destroy(); 
-  if (err == -1) { 
-    perror("ERROR:\nFile: app-cliente0.c\nFunction: main\nError al insertar la tupla"); 
-    return -1;
-  } 
+  int mensaje = destroy();
  
-  return 0; 
+  return mensaje; 
 }

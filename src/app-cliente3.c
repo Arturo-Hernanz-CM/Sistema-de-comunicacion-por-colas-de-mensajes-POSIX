@@ -17,11 +17,7 @@ int main (int argc, char **argv){
   v3.y = 10; 
   
   // Envio de peticion
-  int err = modify_value(key, v1, 2, v2, v3); 
-  if (err == -1) { 
-    perror("ERROR:\nFile: app-cliente3.c\nFunction: main\nError al insertar la tupla"); 
-    return -1;
-  }
+  int mensaje = modify_value(key, v1, 2, v2, v3);
   
-  return 0;  
+  return mensaje;  
 }

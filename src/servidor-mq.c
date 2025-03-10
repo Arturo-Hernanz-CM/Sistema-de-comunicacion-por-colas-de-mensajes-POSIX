@@ -39,16 +39,8 @@ void leer_cola(Peticion * peticion) {
         respuesta = set_value(peticion_local.key, peticion_local.value1, peticion_local.N_value2, peticion_local.value2, peticion_local.value3);
     }
     else if (peticion_local.operacion == 2) {
-        char v1[256];
-        int nv2 = 0;
-        double v2[32];
-        struct Coord v3;
-        respuesta = get_value(peticion_local.key, v1, &nv2, v2, &v3);
         resp.key = peticion_local.key;
-        strcpy(resp.value1, v1);
-        resp.N_value2 = nv2;
-        memcpy(resp.value2, v2, sizeof(double));
-        resp.value3 = v3;
+        respuesta = get_value(resp.key, resp.value1, &resp.N_value2, resp.value2, &resp.value3);
     }
     else if (peticion_local.operacion == 3) {
         respuesta = modify_value(peticion_local.key, peticion_local.value1, peticion_local.N_value2, peticion_local.value2, peticion_local.value3);
@@ -73,6 +65,10 @@ void leer_cola(Peticion * peticion) {
     }
     else {
         if(peticion_local.operacion == 2) {
+            if (respuesta == -1) {
+                resp = peticion_local;
+                resp.key = -1;
+            }
             if (mq_send(cola_cliente, (char *)&resp, sizeof(Peticion), 0) == -1) {
                 perror("ERROR:\nFile: servidor-mq.c\nFunction: leer_cola\nError: No se puede enviar la respuesta");
                 mq_close(cola_servidor);

@@ -12,11 +12,7 @@ int main (int argc, char **argv){
   int key = 1;
 
   // Envio de peticion
-  int err = delete_key(key); 
-  if (err == -1) { 
-    perror("ERROR:\nFile: app-cliente4.c\nFunction: main\nError al insertar la tupla"); 
-    return -1;
-  } 
+  int mensaje = delete_key(key); 
 
-  return 0; 
+  return mensaje; 
 }

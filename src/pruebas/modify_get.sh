@@ -10,7 +10,7 @@ cleanup(){
 trap cleanup SIGINT
 
 ./app-cliente1 
-./app-cliente2 &
+./app-cliente2
 
 
 wait 

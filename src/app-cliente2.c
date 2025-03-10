@@ -4,8 +4,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-Peticion peticion;
-
 // Ejemplo 2 -> get_value
 int main (int argc, char **argv){
   // Valores a asignar a la peticion
@@ -41,13 +39,9 @@ int main (int argc, char **argv){
   }
 
   // Envio de peticion
-  int err = get_value(key, value1, N_value2, value2, value3); 
-  if (err == -1) { 
-    perror("ERROR:\nFile: app-cliente2.c\nFunction: main\nError al insertar la tupla"); 
-    return -1;
-  } 
+  int mensaje = get_value(key, value1, N_value2, value2, value3);
 
-  printf("%s\n", peticion.value1);
+  printf("%s\n", value1);
 
-  return 0; 
+  return mensaje; 
 }

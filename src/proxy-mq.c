@@ -11,14 +11,14 @@ Peticion peticion;
 
 // Funciones
 
-int tratar_peticion(Peticion peticion) {
+int tratar_peticion(Peticion * peticion) {
 
     // Variables
     char nombre_cola[256];
     int respuesta;
 
     //debug
-    printf("Peticion a enviar: %s\n", peticion.value1);
+    printf("Peticion a enviar: %s\n", peticion->value1);
 
     // Colas
     mqd_t cola_cliente;
@@ -28,14 +28,14 @@ int tratar_peticion(Peticion peticion) {
     // Cola del cliente
     atributos_cola_c.mq_flags = 0;         
     atributos_cola_c.mq_maxmsg = 10;
-    if(peticion.operacion == 2){
+    if(peticion->operacion == 2){
         atributos_cola_c.mq_msgsize = sizeof(Peticion);
     }
     else{
         atributos_cola_c.mq_msgsize = sizeof(respuesta);
     }
     sprintf(nombre_cola,  "/Cliente-%d", getpid());
-    strcpy(peticion.cola_cliente, nombre_cola);
+    strcpy(peticion->cola_cliente, nombre_cola);
 
     cola_cliente = mq_open(nombre_cola, O_CREAT | O_RDONLY, 0666, &atributos_cola_c);
     if (cola_cliente == -1) {
@@ -51,37 +51,47 @@ int tratar_peticion(Peticion peticion) {
     }
 
     // Escribir en la cola del servidor
-    if (mq_send(cola_servidor, (char *) &peticion, sizeof(Peticion), 0) == -1) {
+    if (mq_send(cola_servidor, (char *) peticion, sizeof(Peticion), 0) == -1) {
         perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: No se puede enviar la peticion");
         mq_close(cola_servidor);
         mq_unlink("/Servidor");
+        return -1;
     }
 
     // Recibir respuesta en la cola del cliente
-    if (peticion.operacion == 2){
+    if (peticion->operacion == 2){
         Peticion resp;
         if(mq_receive(cola_cliente, (char *)&resp, sizeof(Peticion), 0) == -1) {
             perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: No se puede recibir la respuesta");
             mq_close(cola_cliente);
             mq_unlink(nombre_cola);
+            return -1;
         }
-        printf("%s\n", resp.value1);
-        respuesta = 0;
+        if (resp.key == -1){
+            perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: Error en la respuesta");
+            return -1;
+        }
+        strcpy(peticion->value1, resp.value1);
+        peticion->N_value2 = resp.N_value2;
+        memcpy(&peticion->value2, &resp.value2, sizeof(double));
+        peticion->value3 = resp.value3;
     }
     else{
         if(mq_receive(cola_cliente, (char *)&respuesta, sizeof(respuesta), 0) == -1) {
             perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: No se puede recibir la respuesta");
             mq_close(cola_cliente);
             mq_unlink(nombre_cola);
+            return -1;
+        }
+        if (respuesta == -1){
+            perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: Error en la respuesta");
+            return -1;
         }
     }
     
 	mq_close(cola_servidor);
 	mq_close(cola_cliente);
     mq_unlink(nombre_cola);
-
-    //debug
-    printf("Resultado = %d\n", respuesta);
 
     return 0;
 }
@@ -96,7 +106,8 @@ int destroy(void){
     peticion.value3 = value3;
     peticion.operacion = 0;
 
-    if (tratar_peticion(peticion) == -1){
+    if (tratar_peticion(&peticion) == -1){
+        perror("ERROR:\nFile: proxy-mq.c\nFunction: destroy\nError: Error al destruir");
         return -1;
     }
     return 0;
@@ -110,7 +121,8 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
     peticion.value3 = value3;
     peticion.operacion = 1;
 
-    if (tratar_peticion(peticion) == -1){
+    if (tratar_peticion(&peticion) == -1){
+        perror("ERROR:\nFile: proxy-mq.c\nFunction: set_value\nError: Error al hacer set");
         return -1;
     }
     return 0;
@@ -123,10 +135,18 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
     peticion.value3 = *value3;
     memcpy(&peticion.value3, value3, sizeof(struct Coord));
     peticion.operacion = 2;
-
-    if (tratar_peticion(peticion) == -1){
+    
+    if (tratar_peticion(&peticion) == -1){
+        perror("ERROR:\nFile: proxy-mq.c\nFunction: get_value\nError: Error al hacer get");
         return -1;
     }
+
+    // Escribir la respuesta en los valores que se pasan como argumentos
+    strcpy(value1, peticion.value1);
+    *N_value2 = peticion.N_value2;
+    memcpy(V_value2, &peticion.value2, sizeof(double));
+    *value3 = peticion.value3;
+
     return 0;
 }
 int modify_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
@@ -138,7 +158,8 @@ int modify_value(int key, char *value1, int N_value2, double *V_value2, struct C
     peticion.value3 = value3;
     peticion.operacion = 3;
 
-    if (tratar_peticion(peticion) == -1){
+    if (tratar_peticion(&peticion) == -1){
+        perror("ERROR:\nFile: proxy-mq.c\nFunction: modify_value\nError: Error al modificar");
         return -1;
     }
     return 0;
@@ -153,7 +174,8 @@ int delete_key(int key){
     peticion.value3 = value3;
     peticion.operacion = 4;
     
-    if (tratar_peticion(peticion) == -1){
+    if (tratar_peticion(&peticion) == -1){
+        perror("ERROR:\nFile: proxy-mq.c\nFunction: delete_key\nError: Error al borrar");
         return -1;
     }
     return 0;
@@ -168,7 +190,8 @@ int exist(int key){
     peticion.value3 = value3;
     peticion.operacion = 5; 
 
-    if (tratar_peticion(peticion) == -1){
+    if (tratar_peticion(&peticion) == -1){
+        perror("ERROR:\nFile: proxy-mq.c\nFunction: exist\nError: Error al comprobar existencia");
         return -1;
     }
     return 0;
