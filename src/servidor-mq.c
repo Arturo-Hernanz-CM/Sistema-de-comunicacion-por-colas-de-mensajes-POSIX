@@ -20,8 +20,8 @@ void leer_cola(Peticion * peticion) {
         return;
     }
     mqd_t cola_cliente;
-    Peticion peticion_local;
-    Peticion resp;
+    Peticion peticion_local = {0};
+    Peticion resp = {0};
     int respuesta;
 
     // Copiar la petición a local

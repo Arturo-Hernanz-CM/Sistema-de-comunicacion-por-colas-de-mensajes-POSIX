@@ -7,7 +7,7 @@
 #include <string.h>
 
 // Variable global
-Peticion peticion;
+Peticion peticion = {0};
 
 // Funciones
 

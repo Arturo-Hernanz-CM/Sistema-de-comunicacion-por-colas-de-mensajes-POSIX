@@ -11,13 +11,15 @@ int destroy(void){
     if(base_datos != NULL){
         free(base_datos); 
         base_datos = NULL;
-    }
-    else{
-        Lista *lista = NULL;
-        lista = (Lista *) malloc(sizeof(Lista));    
-        if (lista == NULL) {
+
+        base_datos = (Lista *) malloc(sizeof(Lista));
+        if (base_datos == NULL) {
+            perror("ERROR:\nFile: servidor-mq.c\nFunction: main\nError: Error al reservar memoria para la lista de claves");
             return -1;
         }
+        base_datos->inicio = NULL;
+        base_datos->final = NULL;
+        base_datos->size = 0;
     }
     return 0;
 }
