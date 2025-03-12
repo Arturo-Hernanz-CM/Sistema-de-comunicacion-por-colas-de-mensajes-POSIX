@@ -6,7 +6,7 @@
 
 Peticion peticion;
 
-// Ejemplo 1 -> set_value
+// Ejemplo 6 -> set_value diferente
 int main (int argc, char **argv){
   // Valores a asignar a la peticion
   int key = 2; 

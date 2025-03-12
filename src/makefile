@@ -7,13 +7,13 @@ CFLAGS = -Wall -g -fPIC -pthread -lrt
 # Archivos fuente
 SRCS_SERVER = servidor-mq.c claves.c
 SRCS_PROXY = proxy-mq.c
-SRCS_CLIENT0 = app-cliente0.c
-SRCS_CLIENT1 = app-cliente1.c
-SRCS_CLIENT1.1 = app-cliente1.1.c
-SRCS_CLIENT2 = app-cliente2.c
-SRCS_CLIENT3 = app-cliente3.c
-SRCS_CLIENT4 = app-cliente4.c
-SRCS_CLIENT5 = app-cliente5.c
+SRCS_CLIENT0 = app-cliente-0.c
+SRCS_CLIENT1 = app-cliente-1.c
+SRCS_CLIENT6 = app-cliente-6.c
+SRCS_CLIENT2 = app-cliente-2.c
+SRCS_CLIENT3 = app-cliente-3.c
+SRCS_CLIENT4 = app-cliente-4.c
+SRCS_CLIENT5 = app-cliente-5.c
 
 # Archivos objeto
 OBJS_SERVER = $(SRCS_SERVER:.c=.o)
@@ -24,16 +24,16 @@ LIB_NAME = libclaves.so
 
 # Ejecutables
 TARGET_SERVER = servidor
-TARGET_CLIENT0 = app-cliente0
-TARGET_CLIENT1 = app-cliente1
-TARGET_CLIENT1.1 = app-cliente1.1
-TARGET_CLIENT2 = app-cliente2
-TARGET_CLIENT3 = app-cliente3
-TARGET_CLIENT4 = app-cliente4
-TARGET_CLIENT5 = app-cliente5
+TARGET_CLIENT0 = app-cliente-0
+TARGET_CLIENT1 = app-cliente-1
+TARGET_CLIENT6 = app-cliente-6
+TARGET_CLIENT2 = app-cliente-2
+TARGET_CLIENT3 = app-cliente-3
+TARGET_CLIENT4 = app-cliente-4
+TARGET_CLIENT5 = app-cliente-5
 
 # Regla por defecto: compilar todo
-all: $(TARGET_SERVER) $(LIB_NAME) $(TARGET_CLIENT0) $(TARGET_CLIENT1) $(TARGET_CLIENT1.1) $(TARGET_CLIENT2) $(TARGET_CLIENT3) $(TARGET_CLIENT4) $(TARGET_CLIENT5)
+all: $(TARGET_SERVER) $(LIB_NAME) $(TARGET_CLIENT0) $(TARGET_CLIENT1) $(TARGET_CLIENT6) $(TARGET_CLIENT2) $(TARGET_CLIENT3) $(TARGET_CLIENT4) $(TARGET_CLIENT5)
 
 # Compilar el servidor
 $(TARGET_SERVER): $(OBJS_SERVER)
@@ -43,15 +43,15 @@ $(TARGET_SERVER): $(OBJS_SERVER)
 $(LIB_NAME): $(OBJS_PROXY)
 	$(CC) -shared -o $(LIB_NAME) $(OBJS_PROXY)
 
-# Compilar los clientes y vincular la librería
+# Compilar los cliente-s y vincular la librería
 $(TARGET_CLIENT0): $(SRCS_CLIENT0)
 	$(CC) $(CFLAGS) -o $(TARGET_CLIENT0) $(SRCS_CLIENT0) -L. -lclaves
 
 $(TARGET_CLIENT1): $(SRCS_CLIENT1)
 	$(CC) $(CFLAGS) -o $(TARGET_CLIENT1) $(SRCS_CLIENT1) -L. -lclaves
 
-$(TARGET_CLIENT1.1): $(SRCS_CLIENT1.1)
-	$(CC) $(CFLAGS) -o $(TARGET_CLIENT1.1) $(SRCS_CLIENT1.1) -L. -lclaves
+$(TARGET_CLIENT6): $(SRCS_CLIENT6)
+	$(CC) $(CFLAGS) -o $(TARGET_CLIENT6) $(SRCS_CLIENT6) -L. -lclaves
 
 $(TARGET_CLIENT2): $(SRCS_CLIENT2)
 	$(CC) $(CFLAGS) -o $(TARGET_CLIENT2) $(SRCS_CLIENT2) -L. -lclaves
@@ -71,4 +71,4 @@ $(TARGET_CLIENT5): $(SRCS_CLIENT5)
 
 # Limpiar archivos generados
 clean:
-	rm -f $(OBJS_SERVER) $(OBJS_PROXY) $(TARGET_SERVER) $(TARGET_CLIENT0) $(TARGET_CLIENT1) $(TARGET_CLIENT1.1) $(TARGET_CLIENT2) $(TARGET_CLIENT3) $(TARGET_CLIENT4) $(TARGET_CLIENT5) $(LIB_NAME)
+	rm -f $(OBJS_SERVER) $(OBJS_PROXY) $(TARGET_SERVER) $(TARGET_CLIENT0) $(TARGET_CLIENT1) $(TARGET_CLIENT6) $(TARGET_CLIENT2) $(TARGET_CLIENT3) $(TARGET_CLIENT4) $(TARGET_CLIENT5) $(LIB_NAME)

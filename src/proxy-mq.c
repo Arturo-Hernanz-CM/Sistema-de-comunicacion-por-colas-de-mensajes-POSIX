@@ -69,6 +69,8 @@ int tratar_peticion(Peticion * peticion) {
         }
         if (resp.key == -1){
             perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: Error en la respuesta");
+            mq_close(cola_cliente);
+            mq_unlink(nombre_cola);
             return -1;
         }
         strcpy(peticion->value1, resp.value1);
@@ -85,6 +87,8 @@ int tratar_peticion(Peticion * peticion) {
         }
         if (respuesta == -1){
             perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: Error en la respuesta");
+            mq_close(cola_cliente);
+            mq_unlink(nombre_cola);
             return -1;
         }
     }

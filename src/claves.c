@@ -108,8 +108,12 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
 }
 
 int modify_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
-    if (exist(key) == -1 || N_value2 < 1 || N_value2 > 32){
-        perror("ERROR:\nFile: claves.c\nFunction: modify_value\nError: La clave no existe o el valor N_value2 debe estar entre 1 y 32");
+    if (N_value2 < 1 || N_value2 > 32){
+        perror("ERROR:\nFile: claves.c\nFunction: modify_value\nError: El valor N_value2 debe estar entre 1 y 32");
+        return -1;
+    }
+    if (exist(key) == -1){
+        perror("ERROR:\nFile: claves.c\nFunction: modify_value\nError: La clave no existe");
         return -1;
     }
     else{
