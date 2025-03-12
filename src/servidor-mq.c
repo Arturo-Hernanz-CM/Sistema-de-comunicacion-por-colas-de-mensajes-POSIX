@@ -11,6 +11,8 @@ Lista * base_datos = NULL;
 mqd_t  cola_servidor;
 pthread_mutex_t mutex_mensaje;
 pthread_cond_t condicion_mensaje;
+pthread_mutex_t mutex_funcion;
+pthread_cond_t condicion_funcion;
 int mensaje_copiado = 0;
 
 
@@ -33,23 +35,35 @@ void leer_cola(Peticion * peticion) {
 
     // Ejecutar la petición
     if (peticion_local.operacion == 0) {
+        pthread_mutex_lock(&mutex_funcion);
         respuesta = destroy();
+        pthread_mutex_unlock(&mutex_funcion);
     }
     else if (peticion_local.operacion == 1) {
+        pthread_mutex_lock(&mutex_funcion);
         respuesta = set_value(peticion_local.key, peticion_local.value1, peticion_local.N_value2, peticion_local.value2, peticion_local.value3);
+        pthread_mutex_unlock(&mutex_funcion);
     }
     else if (peticion_local.operacion == 2) {
+        pthread_mutex_lock(&mutex_funcion);
         resp.key = peticion_local.key;
         respuesta = get_value(resp.key, resp.value1, &resp.N_value2, resp.value2, &resp.value3);
+        pthread_mutex_unlock(&mutex_funcion);
     }
     else if (peticion_local.operacion == 3) {
+        pthread_mutex_lock(&mutex_funcion);
         respuesta = modify_value(peticion_local.key, peticion_local.value1, peticion_local.N_value2, peticion_local.value2, peticion_local.value3);
+        pthread_mutex_unlock(&mutex_funcion);
     }
     else if (peticion_local.operacion == 4) {
+        pthread_mutex_lock(&mutex_funcion);
         respuesta = delete_key(peticion_local.key);
+        pthread_mutex_unlock(&mutex_funcion);
     }
     else if (peticion_local.operacion == 5) {
+        pthread_mutex_lock(&mutex_funcion);
         respuesta = exist(peticion_local.key);
+        pthread_mutex_unlock(&mutex_funcion);
     }
     else {
         respuesta = -1;
@@ -110,6 +124,9 @@ int main(void) {
     // Inicializar mutex
     pthread_mutex_init(&mutex_mensaje, NULL);
     pthread_cond_init(&condicion_mensaje, NULL);
+
+    pthread_mutex_init(&mutex_funcion, NULL);
+    pthread_cond_init(&condicion_funcion, NULL);
 
     // Inicializar la cola del serviddor. 
     //El servidor solo lee peticiones aquí, las respuestas en cada cola de cada cliente.

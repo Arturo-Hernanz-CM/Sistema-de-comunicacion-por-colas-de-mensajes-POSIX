@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Variable global auxiliar
+// Variable global
 extern Lista *base_datos;
 
 int destroy(void){
