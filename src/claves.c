@@ -21,6 +21,7 @@ int destroy(void){
         base_datos->final = NULL;
         base_datos->size = 0;
     }
+    printf("Lista destruida.\n");
     return 0;
 }
 
@@ -67,7 +68,6 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
         base_datos->inicio = nodo;
         base_datos->final = nodo;
         base_datos->size = 1;
-        return 0;
     }
     else{
         if(exist(key) == 0){
@@ -79,8 +79,9 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
         base_datos->final = nodo;
         base_datos->final->siguiente = NULL;
         base_datos->size++;
-        return 0;
     }
+    printf("Mensaje guardado en la lista.\n");
+    return 0;
 }
 
 int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coord *value3){
@@ -97,6 +98,7 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
                 memcpy(V_value2, &nodo_actual->value2, sizeof(nodo_actual->value2));
                 value3->x = nodo_actual->value3.x;
                 value3->y = nodo_actual->value3.y;
+                printf("Datos recuperados.\n");
                 return 0;
             }
             else{
@@ -130,6 +132,7 @@ int modify_value(int key, char *value1, int N_value2, double *V_value2, struct C
                 nodo_actual->N_value2 = N_value2;
                 nodo_actual->value2 = V_value2;
                 nodo_actual->value3 = value3;
+                printf("Datos modificados.\n");
                 return 0;
             }
             else{
@@ -152,32 +155,33 @@ int delete_key(int key){
             base_datos->inicio = NULL;
             base_datos->final = NULL;
             base_datos->size = 0;
-            return 0;
         }
-        Nodo *nodo_actual = base_datos->inicio;
-        Nodo *nodo_anterior = NULL;
-        for(int indice = 0; indice < base_datos->size; indice++){
-            if(nodo_actual->key == key){
-                if(nodo_anterior == NULL){
-                    base_datos->inicio = nodo_actual->siguiente;
-                }
-                else if(nodo_actual == base_datos->final){
-                    base_datos->final = nodo_anterior;
+        else{
+            Nodo *nodo_actual = base_datos->inicio;
+            Nodo *nodo_anterior = NULL;
+            for(int indice = 0; indice < base_datos->size; indice++){
+                if(nodo_actual->key == key){
+                    if(nodo_anterior == NULL){
+                        base_datos->inicio = nodo_actual->siguiente;
+                    }
+                    else if(nodo_actual == base_datos->final){
+                        base_datos->final = nodo_anterior;
+                    }
+                    else{
+                        nodo_anterior->siguiente = nodo_actual->siguiente;
+                    }
+                    base_datos->size--;
+                    free(nodo_actual);
                 }
                 else{
-                    nodo_anterior->siguiente = nodo_actual->siguiente;
+                    nodo_anterior = nodo_actual;
+                    nodo_actual = nodo_actual->siguiente;
                 }
-                base_datos->size--;
-                free(nodo_actual);
-                return 0;
-            }
-            else{
-                nodo_anterior = nodo_actual;
-                nodo_actual = nodo_actual->siguiente;
             }
         }
+        printf("Datos asociados a la clave destruidos.\n");
+        return 0;
     }
-    return 0;
 }
 
 int exist(int key){
@@ -189,6 +193,7 @@ int exist(int key){
         Nodo *nodo_actual = base_datos->inicio;
         for(int indice = 0; indice < base_datos->size; indice++){
             if(nodo_actual->key == key){
+                printf("Clave encontrada.\n");
                 return 0;
             }
             else{

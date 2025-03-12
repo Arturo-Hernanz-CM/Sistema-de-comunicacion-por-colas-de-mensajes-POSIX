@@ -17,9 +17,6 @@ int tratar_peticion(Peticion * peticion) {
     char nombre_cola[256];
     int respuesta;
 
-    //debug
-    printf("Peticion a enviar: %s\n", peticion->value1);
-
     // Colas
     mqd_t cola_cliente;
     mqd_t cola_servidor;
@@ -34,7 +31,7 @@ int tratar_peticion(Peticion * peticion) {
     else{
         atributos_cola_c.mq_msgsize = sizeof(respuesta);
     }
-    sprintf(nombre_cola,  "/Cliente-%d", getpid());
+    sprintf(nombre_cola,  "/Cliente-100495850-%d", getpid());
     strcpy(peticion->cola_cliente, nombre_cola);
 
     cola_cliente = mq_open(nombre_cola, O_CREAT | O_RDONLY, 0666, &atributos_cola_c);
@@ -44,30 +41,32 @@ int tratar_peticion(Peticion * peticion) {
     }
 
     // Cola del servidor
-    cola_servidor = mq_open("/Servidor", O_WRONLY);
+    cola_servidor = mq_open("/Servidor-100495850", O_WRONLY);
     if (cola_servidor == -1) {
         perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: Error al abrir la cola del servidor");
         return -1;
     }
 
     // Escribir en la cola del servidor
+    printf("Enviando peticion.\n");
     if (mq_send(cola_servidor, (char *) peticion, sizeof(Peticion), 0) == -1) {
         perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: No se puede enviar la peticion");
         mq_close(cola_servidor);
-        mq_unlink("/Servidor");
+        mq_unlink("/Servidor-100495850");
         return -1;
     }
 
     // Recibir respuesta en la cola del cliente
     if (peticion->operacion == 2){
         Peticion resp;
+        printf("Recibiendo respuesta del servidor.\n");
         if(mq_receive(cola_cliente, (char *)&resp, sizeof(Peticion), 0) == -1) {
             perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: No se puede recibir la respuesta");
             mq_close(cola_cliente);
             mq_unlink(nombre_cola);
             return -1;
         }
-        if (resp.key == -1){
+        if (resp.N_value2 == -1){
             perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: Error en la respuesta");
             mq_close(cola_cliente);
             mq_unlink(nombre_cola);
@@ -114,6 +113,8 @@ int destroy(void){
         perror("ERROR:\nFile: proxy-mq.c\nFunction: destroy\nError: Error al destruir");
         return -1;
     }
+
+    printf("Lista destruida.\n");
     return 0;
 }
 int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
@@ -129,6 +130,8 @@ int set_value(int key, char *value1, int N_value2, double *V_value2, struct Coor
         perror("ERROR:\nFile: proxy-mq.c\nFunction: set_value\nError: Error al hacer set");
         return -1;
     }
+
+    printf("Mensaje guardado en la lista.\n");
     return 0;
 }
 int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coord *value3){
@@ -151,6 +154,7 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
     memcpy(V_value2, &peticion.value2, sizeof(double));
     *value3 = peticion.value3;
 
+    printf("Datos recuperados.\n");
     return 0;
 }
 int modify_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
@@ -166,6 +170,8 @@ int modify_value(int key, char *value1, int N_value2, double *V_value2, struct C
         perror("ERROR:\nFile: proxy-mq.c\nFunction: modify_value\nError: Error al modificar");
         return -1;
     }
+
+    printf("Datos modificados.\n");
     return 0;
 }
 int delete_key(int key){
@@ -182,6 +188,8 @@ int delete_key(int key){
         perror("ERROR:\nFile: proxy-mq.c\nFunction: delete_key\nError: Error al borrar");
         return -1;
     }
+
+    printf("Datos asociados a la clave destruidos.\n");
     return 0;
 }
 int exist(int key){
@@ -198,5 +206,7 @@ int exist(int key){
         perror("ERROR:\nFile: proxy-mq.c\nFunction: exist\nError: Error al comprobar existencia");
         return -1;
     }
+
+    printf("Clave encontrada.\n");
     return 0;
 }

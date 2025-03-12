@@ -70,7 +70,7 @@ void leer_cola(Peticion * peticion) {
     }
 
     // Enviar la respuesta
-    printf("Respuesta a: %s\n", peticion_local.cola_cliente);
+    printf("Enviando respuesta a: %s\n", peticion_local.cola_cliente);
     cola_cliente = mq_open(peticion_local.cola_cliente, O_WRONLY);
     if (cola_cliente == -1) {
         perror("ERROR:\nFile: servidor-mq.c\nFunction: leer_cola\nError: No se puede abrir la cola del cliente");
@@ -81,19 +81,19 @@ void leer_cola(Peticion * peticion) {
         if(peticion_local.operacion == 2) {
             if (respuesta == -1) {
                 resp = peticion_local;
-                resp.key = -1;
+                resp.N_value2 = -1;
             }
             if (mq_send(cola_cliente, (char *)&resp, sizeof(Peticion), 0) == -1) {
                 perror("ERROR:\nFile: servidor-mq.c\nFunction: leer_cola\nError: No se puede enviar la respuesta");
                 mq_close(cola_servidor);
-                mq_unlink("/Servidor");
+                mq_unlink("/Servidor-100495850");
             }  
         }
         else{
           if (mq_send(cola_cliente, (char *)&respuesta, sizeof(respuesta), 0) == -1) {
                 perror("ERROR:\nFile: servidor-mq.c\nFunction: leer_cola\nError: No se puede enviar la respuesta");
                 mq_close(cola_servidor);
-                mq_unlink("/Servidor");
+                mq_unlink("/Servidor-100495850");
             }  
         }
         
@@ -133,7 +133,7 @@ int main(void) {
     atributos_cola_s.mq_flags = 0;         
     atributos_cola_s.mq_maxmsg = 10;
     atributos_cola_s.mq_msgsize = sizeof(Peticion);
-    cola_servidor = mq_open("/Servidor", O_CREAT | O_RDONLY, 0777, &atributos_cola_s);
+    cola_servidor = mq_open("/Servidor-100495850", O_CREAT | O_RDONLY, 0777, &atributos_cola_s);
     if (cola_servidor == -1) {
         perror("ERROR:\nFile: servidor-mq.c\nFunction: main\nError: Error al abrir la cola del servidor");
         return -1;
@@ -142,6 +142,7 @@ int main(void) {
     // Escribir en la cola
 	pthread_attr_setdetachstate(&thread_att, PTHREAD_CREATE_DETACHED);      // threads independientes
     while(1) {
+        printf("Recibiendo peticion del cliente.\n");
         if (mq_receive(cola_servidor, (char *) &peticion, sizeof(Peticion), 0) < 0 ){
 			perror("ERROR:\nFile: servidor-mq.c\nFunction: main\nError: Error al recibir la peticion");
 			return -1;
@@ -158,6 +159,6 @@ int main(void) {
 
     // Se "cierra" la cola del servidor
     mq_close(cola_servidor);
-    mq_unlink("/Servidor");
+    mq_unlink("/Servidor-100495850");
     return 0;
 }

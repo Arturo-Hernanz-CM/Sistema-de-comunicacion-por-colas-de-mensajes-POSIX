@@ -9,8 +9,8 @@ cleanup(){
 
 trap cleanup SIGINT
 
-./app-cliente1&
-./app-cliente1.1
+./app-cliente-1&
+./app-cliente-6
 
 
 wait 
