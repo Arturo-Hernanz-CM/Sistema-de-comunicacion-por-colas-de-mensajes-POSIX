@@ -9,7 +9,8 @@ cleanup(){
 
 trap cleanup SIGINT
 
-./app-cliente-1 
+./app-cliente-1
+./app-cliente-3 
 ./app-cliente-2
 
 

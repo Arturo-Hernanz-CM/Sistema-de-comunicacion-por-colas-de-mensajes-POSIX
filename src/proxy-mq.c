@@ -154,7 +154,13 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
     memcpy(V_value2, &peticion.value2, sizeof(double));
     *value3 = peticion.value3;
 
-    printf("Datos recuperados.\n");
+    printf("Datos de la clave %d recuperados:\n", key);
+    printf("value1: %s\n", value1);
+    printf("N_value2: %d\n", *N_value2);
+    printf("value2: %f\n", *V_value2);
+    printf("value3.x: %d\n", value3->x);
+    printf("value3.y: %d\n", value3->y);
+    
     return 0;
 }
 int modify_value(int key, char *value1, int N_value2, double *V_value2, struct Coord value3){
