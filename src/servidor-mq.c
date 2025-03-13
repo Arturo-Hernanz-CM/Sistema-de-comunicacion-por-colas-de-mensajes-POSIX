@@ -142,11 +142,11 @@ int main(void) {
     // Escribir en la cola
 	pthread_attr_setdetachstate(&thread_att, PTHREAD_CREATE_DETACHED);      // threads independientes
     while(1) {
-        printf("Recibiendo peticion del cliente.\n");
         if (mq_receive(cola_servidor, (char *) &peticion, sizeof(Peticion), 0) < 0 ){
 			perror("ERROR:\nFile: servidor-mq.c\nFunction: main\nError: Error al recibir la peticion");
 			return -1;
 		}
+        printf("\nRecibiendo peticion del cliente.\n");
         if(pthread_create(&thread, &thread_att, (void*) leer_cola, &peticion) == 0) {
             pthread_mutex_lock(&mutex_mensaje);
             while(mensaje_copiado == 0) {

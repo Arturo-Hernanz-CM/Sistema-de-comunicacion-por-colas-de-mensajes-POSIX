@@ -78,6 +78,7 @@ int tratar_peticion(Peticion * peticion) {
         peticion->value3 = resp.value3;
     }
     else{
+        printf("Recibiendo respuesta del servidor.\n");
         if(mq_receive(cola_cliente, (char *)&respuesta, sizeof(respuesta), 0) == -1) {
             perror("ERROR:\nFile: proxy-mq.c\nFunction: tratar_peticion\nError: No se puede recibir la respuesta");
             mq_close(cola_cliente);
@@ -157,7 +158,6 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
     printf("Datos de la clave %d recuperados:\n", key);
     printf("value1: %s\n", value1);
     printf("N_value2: %d\n", *N_value2);
-    printf("value2: %f\n", *V_value2);
     printf("value3.x: %d\n", value3->x);
     printf("value3.y: %d\n", value3->y);
     

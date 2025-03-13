@@ -94,7 +94,7 @@ int get_value(int key, char *value1, int *N_value2, double *V_value2, struct Coo
         for(int indice = 0; indice < base_datos->size; indice++){
             if(nodo_actual->key == key){
                 strcpy(value1, nodo_actual->value1);
-                memcpy(V_value2, &nodo_actual->value2, sizeof(nodo_actual->value2));
+                memcpy(N_value2, &nodo_actual->N_value2, sizeof(nodo_actual->N_value2));
                 memcpy(V_value2, &nodo_actual->value2, sizeof(nodo_actual->value2));
                 value3->x = nodo_actual->value3.x;
                 value3->y = nodo_actual->value3.y;
